@@ -5,7 +5,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 
 public class MainMenuScreen implements Screen {
 	final CDGame game;
@@ -17,11 +21,19 @@ public class MainMenuScreen implements Screen {
 	private BitmapFont promptFont;
 	private BitmapFont verisonFont;
 	
+	private float bucketX;
+	private float bucketY;
+	private Vector3 touchPos;
+	
 	public MainMenuScreen(final CDGame game) {
 		this.game = game;
 		camera = game.camera;
-		//camera.setToOrtho(false, game.GAME_WIDTH, game.GAME_HEIGHT);
-		promptText1 = game.callToAction + " to play";
+		promptText1 = game.callToAction + " the bucket to play";
+		
+		bucketX = game.GAME_WIDTH/2-64/2;
+		bucketY = 20;
+		
+		touchPos = new Vector3();
 		
 		if(!game.assManager.isLoaded("title.ttf")) {
 			game.assManager.finishLoading();
@@ -46,15 +58,29 @@ public class MainMenuScreen implements Screen {
 		welcomeFont.draw(game.batch, welcomeText.toString(), game.GAME_WIDTH/2-welcomeFont.getBounds(welcomeText).width/2, game.GAME_HEIGHT/2-welcomeFont.getBounds(welcomeText).height+200);
 		promptFont.setColor(Color.WHITE);
 		promptFont.draw(game.batch, promptText1, game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
+		game.batch.draw(new Texture("bucket.png"), bucketX, bucketY);
 		game.batch.end();
+		
+		game.shapeRender.setProjectionMatrix(camera.combined);
+		game.shapeRender.begin(ShapeType.Filled);
+		game.shapeRender.setColor(Color.DARK_GRAY);
+		game.shapeRender.rect(0, 0, game.GAME_WIDTH, 20);
+		game.shapeRender.end();
 		
 		update(Gdx.graphics.getDeltaTime());
 	}
 	
 	public void update(float delta) {
 		if(Gdx.input.isTouched()) {
-			game.setScreen(game.gScr);
-			dispose();
+			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			camera.unproject(touchPos);
+			
+			if(touchPos.x >= bucketX && touchPos.x <= bucketX+64) {
+				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
+					game.setScreen(game.gScr);
+					dispose();
+				}
+			}
 		}
 		
 		camera.update();

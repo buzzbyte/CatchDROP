@@ -30,9 +30,11 @@ public class GameScreen implements Screen {
 	private long rainTimer = 1000;
 	private long delay = 100;
 	private long delayTimer = delay;
-	
+	private boolean spawnDrops = true;
+	private boolean bucketTouched = false;
 	
 	private CharSequence pauseText = "PAUSED";
+	private CharSequence pausePromptText;
 	private long tempHighscore;
 
 	private Vector3 touchPos;
@@ -44,14 +46,15 @@ public class GameScreen implements Screen {
 	public GameScreen(final CDGame game) {
 		this.game = game;
 		
+		pausePromptText = game.callToAction + " the bucket to resume";
+		
 		if(!game.assManager.isLoaded("title.ttf")) {
 			game.assManager.finishLoading();
 		}
 		
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
-		mainFont = game.assManager.get("score.ttf", BitmapFont.class);
+		mainFont = game.assManager.get("prompt.ttf", BitmapFont.class);
 		camera = game.camera;
-		//camera.setToOrtho(false, game.GAME_WIDTH, game.GAME_HEIGHT);
 		
 		touchPos = new Vector3();
 		
@@ -69,22 +72,28 @@ public class GameScreen implements Screen {
 	}
 
 	private void spawnRaindrop() {
-		Rectangle raindrop = new Rectangle(MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, 64, 64);
-		raindrops.add(raindrop);
-		lastTimeDropped = TimeUtils.nanoTime();
+		if(spawnDrops) {
+			Rectangle raindrop = new Rectangle(MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, 64, 64);
+			raindrops.add(raindrop);
+			lastTimeDropped = TimeUtils.nanoTime();
+		}
 	}
 	
 	@Override
 	public void render(float delta) {
+		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		game.batch.setProjectionMatrix(camera.combined);
+		game.batch.begin();
+		scoreFont.setColor(Color.YELLOW);
+		scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
+		scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-40);
+		game.batch.end();
+		
 		if(!game.paused) {
 			// TODO Auto-generated method stub
-			Gdx.gl.glClearColor(0, 0, 0.2f, 1);
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 			game.batch.setProjectionMatrix(camera.combined);
 			game.batch.begin();
-			scoreFont.setColor(Color.YELLOW);
-			scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
-			scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-40);
 			game.batch.draw(bucketImg, bucket.x, bucket.y);
 			for(Rectangle raindrop : raindrops) {
 				game.batch.draw(dropImg, raindrop.x, raindrop.y);
@@ -96,76 +105,100 @@ public class GameScreen implements Screen {
 			game.shapeRender.setColor(Color.DARK_GRAY);
 			game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
 			game.shapeRender.end();
-			
-			update(Gdx.graphics.getDeltaTime());
 		} else {
-			Gdx.gl.glClearColor(0, 0, 0.1f, 1);
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 			game.batch.setProjectionMatrix(camera.combined);
 			game.batch.begin();
-			mainFont.setColor(Color.YELLOW);
-			mainFont.draw(game.batch, pauseText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(pauseText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(pauseText).height/4);
-			//Rectangle resumeBtn = new Rectangle();
-			//resumeBtn.set(game.GAME_WIDTH/2-resumeBtn.width/2, game.GAME_HEIGHT/2-resumeBtn.height/2, 200, 50);
-			//resumeBtn.
+			mainFont.setColor(Color.WHITE);
+			mainFont.draw(game.batch, pauseText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(pauseText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(pauseText).height+20);
+			mainFont.setColor(Color.LIGHT_GRAY);
+			mainFont.draw(game.batch, pausePromptText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(pausePromptText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(pausePromptText).height-20);
+			game.batch.draw(bucketImg, bucket.x, bucket.y);
 			game.batch.end();
-			if(Gdx.input.isKeyJustPressed(Keys.P)) resume();
+			
+			game.shapeRender.setProjectionMatrix(camera.combined);
+			game.shapeRender.begin(ShapeType.Filled);
+			game.shapeRender.setColor(Color.DARK_GRAY);
+			game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
+			game.shapeRender.end();
 		}
+		update(delta);
 	}
 	
 	public void update(float delta) {
-		if(Gdx.input.isTouched()) {
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			bucket.x = touchPos.x-64/2;
-		}
-		
-		if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 650*delta;
-		if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 650*delta;
-		
-		if(bucket.x < 0) bucket.x = 0;
-		if(bucket.x > game.GAME_WIDTH-64) bucket.x = game.GAME_WIDTH-64;
-		
-		if(TimeUtils.nanoTime()-lastTimeDropped>TimeUtils.millisToNanos(rainTimer)) spawnRaindrop();
-		
-		Iterator<Rectangle> iter = raindrops.iterator();
-		while(iter.hasNext()) {
-			Rectangle raindrop = iter.next();
-			raindrop.y -= 210*delta;
-			if(raindrop.y+64 < 0) {
-				iter.remove();
-				game.setScreen(new EndScreen(game));
-				dispose();
+		if(!game.paused) {
+			if(Gdx.input.isTouched()) {
+				touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				camera.unproject(touchPos);
+				
+				if(touchPos.x >= bucket.x && touchPos.x <= bucket.x+bucket.width) {
+					if(touchPos.y >= bucket.y && touchPos.y <= bucket.y+bucket.height) {
+						bucketTouched = true;
+					}
+				}
+				
+				if(bucketTouched) {
+					bucket.x = touchPos.x-64/2;
+				}
+			} else {
+				bucketTouched = false;
+				pause();
 			}
-			if(raindrop.overlaps(ground)) {
-				iter.remove();
-				game.setScreen(new EndScreen(game));
-				dispose();
-			}
-			if(raindrop.overlaps(bucket)) {
-				game.score++;
-				if(game.score > tempHighscore) tempHighscore = game.score;
-				iter.remove();
-			}
-		}
-		
-		if(Gdx.input.isTouched()) {
 			
+			if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 650*delta;
+			if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 650*delta;
+			
+			if(bucket.x < 0) bucket.x = 0;
+			if(bucket.x > game.GAME_WIDTH-64) bucket.x = game.GAME_WIDTH-64;
+			
+			if(TimeUtils.nanoTime()-lastTimeDropped>TimeUtils.millisToNanos(rainTimer)) spawnRaindrop();
+			
+			Iterator<Rectangle> iter = raindrops.iterator();
+			while(iter.hasNext()) {
+				Rectangle raindrop = iter.next();
+				raindrop.y -= 210*delta;
+				if(raindrop.y+64 < 0) {
+					iter.remove();
+					game.setScreen(new EndScreen(game));
+					dispose();
+				}
+				if(raindrop.overlaps(ground)) {
+					iter.remove();
+					game.setScreen(new EndScreen(game));
+					dispose();
+				}
+				if(raindrop.overlaps(bucket)) {
+					game.score++;
+					if(game.score > tempHighscore) tempHighscore = game.score;
+					if(iter.hasNext())
+						iter.remove();
+				}
+			}
+			
+			if(Gdx.input.isTouched()) {
+				
+			}
+			
+			if(Gdx.input.isKeyJustPressed(Keys.P)) pause();
+			
+			delayTimer -= delta;
+			
+			if(delayTimer <= 0) {
+				rainTimer -= 10;
+				delayTimer = delay;
+			}
+		} else {
+			if(Gdx.input.isKeyJustPressed(Keys.P)) resume();
+			if(Gdx.input.isTouched()) {
+				touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				camera.unproject(touchPos);
+				
+				if(touchPos.x >= bucket.x && touchPos.x <= bucket.x+bucket.width) {
+					if(touchPos.y >= bucket.y && touchPos.y <= bucket.y+bucket.height) {
+						resume();
+					}
+				}
+			}
 		}
-		
-		if(Gdx.input.isKeyJustPressed(Keys.P)) pause();
-		
-		delayTimer -= delta;
-		
-		if(delayTimer <= 0) {
-			//System.out.println("Triggered delay.");
-			rainTimer -= 10;
-			delayTimer = delay;
-			//System.out.println("rainTimer = " + rainTimer);
-		} /* else {
-			//System.out.println("delayTimer = " + delayTimer);
-		} // */
-		
 		camera.update();
 	}
 

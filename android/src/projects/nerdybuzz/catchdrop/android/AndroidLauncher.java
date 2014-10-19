@@ -14,6 +14,6 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useAccelerometer = false;
 		config.useCompass = false;
-		initialize(new CDGame("Tap"), config);
+		initialize(new CDGame("Touch"), config);
 	}
 }

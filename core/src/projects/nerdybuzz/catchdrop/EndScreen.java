@@ -5,7 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector3;
 
 public class EndScreen implements Screen {
 	final CDGame game;
@@ -17,10 +20,19 @@ public class EndScreen implements Screen {
 	private BitmapFont mainFont;
 	private BitmapFont scoreFont;
 	private BitmapFont promptFont;
+	
+	private float bucketX;
+	private float bucketY;
+	private Vector3 touchPos;
 
 	public EndScreen(final CDGame game) {
 		this.game = game;
 		camera = game.camera;
+		
+		bucketX = game.GAME_WIDTH/2-64/2;
+		bucketY = 20;
+		
+		touchPos = new Vector3();
 		
 		if(game.score > game.getHighscore()) {
 			game.setHighscore(game.score);
@@ -28,7 +40,7 @@ public class EndScreen implements Screen {
 		
 		gscoreText = "Score: " + game.score;
 		ghscoreText = "Highscore: " + game.getHighscore();
-		promptText1 = game.callToAction + " to play again";
+		promptText1 = game.callToAction + " the bucket to play again";
 		
 		if(!game.assManager.isLoaded("title.ttf")) {
 			game.assManager.finishLoading();
@@ -37,7 +49,6 @@ public class EndScreen implements Screen {
 		mainFont = game.assManager.get("gover.ttf", BitmapFont.class);
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
 		promptFont = game.assManager.get("prompt.ttf", BitmapFont.class);
-		//camera.setToOrtho(false, game.GAME_WIDTH, game.GAME_HEIGHT);
 	}
 	
 	@Override
@@ -50,20 +61,34 @@ public class EndScreen implements Screen {
 		mainFont.setColor(Color.RED);
 		mainFont.draw(game.batch, goverText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(goverText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(goverText).height+200);
 		scoreFont.setColor(Color.YELLOW);
-		scoreFont.draw(game.batch, gscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(gscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(gscoreText).height/4);
-		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height*2);
+		scoreFont.draw(game.batch, gscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(gscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(gscoreText).height+55);
+		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+20);
 		promptFont.setColor(Color.WHITE);
-		promptFont.draw(game.batch, promptText1.toString(), game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*6);
+		promptFont.draw(game.batch, promptText1.toString(), game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
+		game.batch.draw(new Texture("bucket.png"), bucketX, bucketY);
 		game.batch.end();
+		
+		game.shapeRender.setProjectionMatrix(camera.combined);
+		game.shapeRender.begin(ShapeType.Filled);
+		game.shapeRender.setColor(Color.DARK_GRAY);
+		game.shapeRender.rect(0, 0, game.GAME_WIDTH, 20);
+		game.shapeRender.end();
 		
 		update(Gdx.graphics.getDeltaTime());
 	}
 	
 	public void update(float delta) {
 		if(Gdx.input.justTouched()) {
-			game.score = 0;
-			game.setScreen(new GameScreen(game));
-			dispose();
+			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			camera.unproject(touchPos);
+			
+			if(touchPos.x >= bucketX && touchPos.x <= bucketX+64) {
+				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
+					game.score = 0;
+					game.setScreen(new GameScreen(game));
+					dispose();
+				}
+			}
 		}
 	}
 
