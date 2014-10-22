@@ -35,18 +35,22 @@ public class GameScreen implements Screen {
 	
 	private CharSequence pauseText = "PAUSED";
 	private CharSequence pausePromptText;
+	private CharSequence optionText1;
+	private String optionText2;
 	private long tempHighscore;
 
 	private Vector3 touchPos;
-
+	private Vector3 mousePos;
 	private BitmapFont scoreFont;
-
 	private BitmapFont mainFont;
+	private BitmapFont cornerFont;
 	
 	public GameScreen(final CDGame game) {
 		this.game = game;
 		
 		pausePromptText = game.callToAction + " the bucket to resume";
+		optionText1 = "Pause (P)";
+		optionText2 = "Resume (P)";
 		
 		if(!game.assManager.isLoaded("title.ttf")) {
 			game.assManager.finishLoading();
@@ -54,9 +58,11 @@ public class GameScreen implements Screen {
 		
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
 		mainFont = game.assManager.get("prompt.ttf", BitmapFont.class);
+		cornerFont = game.assManager.get("corner.ttf", BitmapFont.class);
 		camera = game.camera;
 		
 		touchPos = new Vector3();
+		mousePos = new Vector3();
 		
 		tempHighscore = game.getHighscore();
 		
@@ -91,35 +97,36 @@ public class GameScreen implements Screen {
 		game.batch.end();
 		
 		if(!game.paused) {
-			// TODO Auto-generated method stub
+			game.shapeRender.setProjectionMatrix(camera.combined);
+			game.shapeRender.begin(ShapeType.Filled);
+			game.shapeRender.setColor(Color.DARK_GRAY);
+			game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
+			game.shapeRender.end();
+			
 			game.batch.setProjectionMatrix(camera.combined);
 			game.batch.begin();
 			game.batch.draw(bucketImg, bucket.x, bucket.y);
 			for(Rectangle raindrop : raindrops) {
 				game.batch.draw(dropImg, raindrop.x, raindrop.y);
 			}
+			if(!game.autoPause) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
 			game.batch.end();
-			
+		} else {
 			game.shapeRender.setProjectionMatrix(camera.combined);
 			game.shapeRender.begin(ShapeType.Filled);
 			game.shapeRender.setColor(Color.DARK_GRAY);
 			game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
 			game.shapeRender.end();
-		} else {
+			
 			game.batch.setProjectionMatrix(camera.combined);
 			game.batch.begin();
+			game.batch.draw(bucketImg, bucket.x, bucket.y);
 			mainFont.setColor(Color.WHITE);
 			mainFont.draw(game.batch, pauseText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(pauseText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(pauseText).height+20);
 			mainFont.setColor(Color.LIGHT_GRAY);
 			mainFont.draw(game.batch, pausePromptText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(pausePromptText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(pausePromptText).height-20);
-			game.batch.draw(bucketImg, bucket.x, bucket.y);
+			if(!game.autoPause) cornerFont.draw(game.batch, optionText2, 10, cornerFont.getBounds(optionText2).height+10);
 			game.batch.end();
-			
-			game.shapeRender.setProjectionMatrix(camera.combined);
-			game.shapeRender.begin(ShapeType.Filled);
-			game.shapeRender.setColor(Color.DARK_GRAY);
-			game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
-			game.shapeRender.end();
 		}
 		update(delta);
 	}
@@ -140,12 +147,19 @@ public class GameScreen implements Screen {
 					bucket.x = touchPos.x-64/2;
 				}
 			} else {
-				bucketTouched = false;
-				pause();
+				if(game.noDrag && !game.autoPause) {
+					mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+					camera.unproject(mousePos);
+					bucket.x = mousePos.x-64/2;
+					Gdx.input.setCursorPosition((int)mousePos.x, (int)bucket.y+game.GAME_HEIGHT-55);
+				} else {
+					bucketTouched = false;
+					if(game.autoPause) pause();
+				}
 			}
 			
-			if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 650*delta;
-			if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 650*delta;
+			if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 750*delta;
+			if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 750*delta;
 			
 			if(bucket.x < 0) bucket.x = 0;
 			if(bucket.x > game.GAME_WIDTH-64) bucket.x = game.GAME_WIDTH-64;
@@ -167,10 +181,11 @@ public class GameScreen implements Screen {
 					dispose();
 				}
 				if(raindrop.overlaps(bucket)) {
+					iter.remove();
 					game.score++;
 					if(game.score > tempHighscore) tempHighscore = game.score;
-					if(iter.hasNext())
-						iter.remove();
+					//if(iter.hasNext())
+					//	iter.remove();
 				}
 			}
 			

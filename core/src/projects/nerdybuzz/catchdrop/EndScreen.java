@@ -2,6 +2,7 @@ package projects.nerdybuzz.catchdrop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,16 +15,19 @@ public class EndScreen implements Screen {
 	final CDGame game;
 	OrthographicCamera camera;
 	private CharSequence goverText = "GAME OVER";
+	CharSequence optionText1;
 	private CharSequence gscoreText;
 	private String ghscoreText;
 	private CharSequence promptText1;
 	private BitmapFont mainFont;
 	private BitmapFont scoreFont;
 	private BitmapFont promptFont;
+	private BitmapFont cornerFont;
 	
 	private float bucketX;
 	private float bucketY;
 	private Vector3 touchPos;
+	
 
 	public EndScreen(final CDGame game) {
 		this.game = game;
@@ -41,6 +45,7 @@ public class EndScreen implements Screen {
 		gscoreText = "Score: " + game.score;
 		ghscoreText = "Highscore: " + game.getHighscore();
 		promptText1 = game.callToAction + " the bucket to play again";
+		optionText1 = "Auto-Pause: " + game.autoPauseStr + " (P)";
 		
 		if(!game.assManager.isLoaded("title.ttf")) {
 			game.assManager.finishLoading();
@@ -49,6 +54,7 @@ public class EndScreen implements Screen {
 		mainFont = game.assManager.get("gover.ttf", BitmapFont.class);
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
 		promptFont = game.assManager.get("prompt.ttf", BitmapFont.class);
+		cornerFont = game.assManager.get("corner.ttf", BitmapFont.class);
 	}
 	
 	@Override
@@ -56,17 +62,6 @@ public class EndScreen implements Screen {
 		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(0, 0, 0.1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		game.batch.setProjectionMatrix(camera.combined);
-		game.batch.begin();
-		mainFont.setColor(Color.RED);
-		mainFont.draw(game.batch, goverText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(goverText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(goverText).height+200);
-		scoreFont.setColor(Color.YELLOW);
-		scoreFont.draw(game.batch, gscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(gscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(gscoreText).height+55);
-		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+20);
-		promptFont.setColor(Color.WHITE);
-		promptFont.draw(game.batch, promptText1.toString(), game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
-		game.batch.draw(new Texture("bucket.png"), bucketX, bucketY);
-		game.batch.end();
 		
 		game.shapeRender.setProjectionMatrix(camera.combined);
 		game.shapeRender.begin(ShapeType.Filled);
@@ -74,10 +69,25 @@ public class EndScreen implements Screen {
 		game.shapeRender.rect(0, 0, game.GAME_WIDTH, 20);
 		game.shapeRender.end();
 		
+		game.batch.setProjectionMatrix(camera.combined);
+		game.batch.begin();
+		game.batch.draw(new Texture("bucket.png"), bucketX, bucketY);
+		mainFont.setColor(Color.RED);
+		mainFont.draw(game.batch, goverText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(goverText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(goverText).height+200);
+		scoreFont.setColor(Color.YELLOW);
+		scoreFont.draw(game.batch, gscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(gscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(gscoreText).height+55);
+		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+20);
+		promptFont.setColor(Color.WHITE);
+		promptFont.draw(game.batch, promptText1.toString(), game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
+		if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
+		game.batch.end();
+		
 		update(Gdx.graphics.getDeltaTime());
 	}
 	
 	public void update(float delta) {
+		optionText1 = "Auto-Pause: " + game.autoPauseStr + " (P)";
+		
 		if(Gdx.input.justTouched()) {
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
@@ -90,6 +100,9 @@ public class EndScreen implements Screen {
 				}
 			}
 		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.P))
+			if(game.autoPause) game.autoPause = false; else game.autoPause = true;
 	}
 
 	@Override

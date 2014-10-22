@@ -1,7 +1,5 @@
 package projects.nerdybuzz.catchdrop;
 
-import org.json.simple.JSONObject;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -19,8 +17,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoa
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class CDGame extends Game {
-	public static final String GAME_VERSION = "v2.0-alpha";
-	//public static final String GAME_VERSION = "testing-alpha";
+	//public static final String GAME_VERSION = "v2.0-alpha";
+	public static final String GAME_VERSION = "testing-alpha";
 	
 	public final int GAME_WIDTH  = 800;
 	public final int GAME_HEIGHT = 480;
@@ -33,19 +31,35 @@ public class CDGame extends Game {
 	protected GameScreen gScr;
 	
 	public boolean paused = false;
+	public boolean autoPause = true;
+	public String autoPauseStr;
 	public int score = 0;
 	public long highScore;
 	public FreeTypeFontGenerator generator;
 	public FreeTypeFontParameter parameter;
 	public AssetManager assManager;
-	public String callToAction = "Tap or Click";
-	public JSONObject gameJson;
+	public String callToAction = "Touch or Click";
 	public Preferences gamePrefs;
+	public boolean usingDesktop;
+	public boolean noDrag;
+	public String dragStr;
 	
-	public CDGame() {}
+	public CDGame() {
+		this.callToAction = "Touch or Click";
+		this.usingDesktop = true;
+		this.noDrag  = true;
+	}
 	
 	public CDGame(String callToAction) {
 		this.callToAction = callToAction;
+		this.usingDesktop = true;
+		this.noDrag  = true;
+	}
+	
+	public CDGame(String callToAction, boolean desktop) {
+		this.callToAction = callToAction;
+		this.usingDesktop = desktop;
+		this.noDrag  = desktop;
 	}
 	
 	public void create() {
@@ -78,8 +92,7 @@ public class CDGame extends Game {
 		FreeTypeFontLoaderParameter versionParams = new FreeTypeFontLoaderParameter();
 		versionParams.fontFileName = "font/arial.ttf";
 		versionParams.fontParameters.size = 20;
-		assManager.load("verison.ttf", BitmapFont.class, versionParams);
-		
+		assManager.load("corner.ttf", BitmapFont.class, versionParams); 
 		/*
 		if(Gdx.files.internal("data.json").exists()) {
 			System.out.println("Data file exists!");
@@ -105,6 +118,8 @@ public class CDGame extends Game {
 		}
 		// */
 		
+		if(usingDesktop) autoPause = false;
+		
 		gamePrefs = Gdx.app.getPreferences("Game");
 		//gamePrefs.getLong("highscore", 0);
 		
@@ -122,6 +137,8 @@ public class CDGame extends Game {
 
 	@Override
 	public void render() {
+		if(autoPause) autoPauseStr = "ON"; else autoPauseStr = "OFF";
+		if(!noDrag) dragStr = "ON"; else dragStr = "OFF";
 		if(assManager.update() && assManager.isLoaded("title.ttf")) {
 			super.render();
 		}
