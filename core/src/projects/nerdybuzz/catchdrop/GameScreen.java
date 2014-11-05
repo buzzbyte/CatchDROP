@@ -85,7 +85,7 @@ public class GameScreen implements Screen {
 		
 		bucketImg = new Texture(Gdx.files.internal("bucket.png"));
 		dropImg = new Texture(Gdx.files.internal("drop.png"));
-		burntToastImg = new Texture(Gdx.files.absolute("C:\\Users\\stmsalah1\\libgdx\\catchdrop\\android\\assets\\burntToast.jpg"));
+		burntToastImg = new Texture(Gdx.files.internal("burntToast.jpg"));
 		//bucketImg = new Texture("sprites/bucket.png");
 		//dropImg = new Texture("sprites/drop.png");
 		
