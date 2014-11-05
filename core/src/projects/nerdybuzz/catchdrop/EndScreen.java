@@ -114,7 +114,9 @@ public class EndScreen implements Screen {
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		
+		if(Gdx.input.isCursorCatched()) {
+			Gdx.input.setCursorCatched(false);
+		}
 	}
 
 	@Override
