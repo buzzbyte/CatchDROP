@@ -6,7 +6,10 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -29,6 +32,7 @@ public class CDGame extends Game {
 	protected OrthographicCamera camera;
 	protected MainMenuScreen mMScr;
 	protected GameScreen gScr;
+	protected SettingsScreen gSettings;
 	
 	public boolean paused = false;
 	public boolean autoPause = true;
@@ -43,6 +47,8 @@ public class CDGame extends Game {
 	public boolean usingDesktop;
 	public boolean noDrag;
 	public String dragStr;
+
+	public boolean initedSettings = false;
 	
 	public CDGame() {
 		this.callToAction = "Touch or Click";
@@ -92,7 +98,14 @@ public class CDGame extends Game {
 		FreeTypeFontLoaderParameter versionParams = new FreeTypeFontLoaderParameter();
 		versionParams.fontFileName = "font/arial.ttf";
 		versionParams.fontParameters.size = 20;
-		assManager.load("corner.ttf", BitmapFont.class, versionParams); 
+		assManager.load("corner.ttf", BitmapFont.class, versionParams);
+		assManager.load("size20.ttf", BitmapFont.class, versionParams);
+		
+		FreeTypeFontLoaderParameter headerParams = new FreeTypeFontLoaderParameter();
+		headerParams.fontFileName = "font/arial.ttf";
+		headerParams.fontParameters.size = 50;
+		assManager.load("heading.ttf", BitmapFont.class, headerParams); 
+		
 		/*
 		if(Gdx.files.internal("data.json").exists()) {
 			System.out.println("Data file exists!");
@@ -131,6 +144,7 @@ public class CDGame extends Game {
 		
 		mMScr = new MainMenuScreen(this);
 		gScr = new GameScreen(this);
+		//gSettings = new SettingsScreen(this);
 		
 		this.setScreen(mMScr);
 	}

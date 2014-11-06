@@ -26,7 +26,11 @@ public class EndScreen implements Screen {
 	
 	private float bucketX;
 	private float bucketY;
+	private int settingsBtnX;
+	private int settingsBtnY;
 	private Vector3 touchPos;
+	
+	private Texture settingsIcon;
 	
 
 	public EndScreen(final CDGame game) {
@@ -35,6 +39,11 @@ public class EndScreen implements Screen {
 		
 		bucketX = game.GAME_WIDTH/2-64/2;
 		bucketY = 20;
+		
+		settingsBtnX = 10;
+		settingsBtnY = 10;
+		
+		settingsIcon = new Texture("gear_btn.png");
 		
 		touchPos = new Vector3();
 		
@@ -79,7 +88,8 @@ public class EndScreen implements Screen {
 		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+20);
 		promptFont.setColor(Color.WHITE);
 		promptFont.draw(game.batch, promptText1.toString(), game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
-		if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
+		//if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
+		game.batch.draw(settingsIcon, settingsBtnX, settingsBtnY, 44, 44);
 		game.batch.end();
 		
 		update(Gdx.graphics.getDeltaTime());
@@ -97,6 +107,14 @@ public class EndScreen implements Screen {
 					game.score = 0;
 					game.setScreen(new GameScreen(game));
 					dispose();
+				}
+			}
+			
+			if(touchPos.x >= settingsBtnX && touchPos.x <= settingsBtnX+44) {
+				if(touchPos.y >= settingsBtnY && touchPos.y <= settingsBtnY+44) {
+					//System.out.println("Settings button triggered!");
+					game.gSettings = new SettingsScreen(game, this);
+					game.setScreen(game.gSettings);
 				}
 			}
 		}

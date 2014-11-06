@@ -27,7 +27,11 @@ public class MainMenuScreen implements Screen {
 	
 	private float bucketX;
 	private float bucketY;
+	private int settingsBtnX;
+	private int settingsBtnY;
 	private Vector3 touchPos;
+	
+	private Texture settingsIcon;
 	
 	
 	public MainMenuScreen(final CDGame game) {
@@ -37,6 +41,11 @@ public class MainMenuScreen implements Screen {
 		
 		bucketX = game.GAME_WIDTH/2-64/2;
 		bucketY = 20;
+		
+		settingsBtnX = 10;
+		settingsBtnY = 10;
+		
+		settingsIcon = new Texture("gear_btn.png");
 		
 		touchPos = new Vector3();
 		
@@ -71,7 +80,7 @@ public class MainMenuScreen implements Screen {
 		game.batch.draw(new Texture("bucket.png"), bucketX, bucketY);
 		cornerFont.setColor(Color.WHITE);
 		cornerFont.draw(game.batch, CDGame.GAME_VERSION, 5, game.GAME_HEIGHT-5);
-		if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
+		//if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
 		welcomeFont.setColor(Color.GREEN);
 		welcomeFont.draw(game.batch, welcomeText.toString(), game.GAME_WIDTH/2-welcomeFont.getBounds(welcomeText).width/2, game.GAME_HEIGHT/2-welcomeFont.getBounds(welcomeText).height+200);
 		scoreFont.setColor(Color.YELLOW);
@@ -79,6 +88,7 @@ public class MainMenuScreen implements Screen {
 		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+25);
 		promptFont.setColor(Color.WHITE);
 		promptFont.draw(game.batch, promptText1, game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
+		game.batch.draw(settingsIcon, settingsBtnX, settingsBtnY, 44, 44);
 		game.batch.end();
 		
 		update(Gdx.graphics.getDeltaTime());
@@ -95,6 +105,15 @@ public class MainMenuScreen implements Screen {
 			if(touchPos.x >= bucketX && touchPos.x <= bucketX+64) {
 				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
 					game.setScreen(game.gScr);
+					dispose();
+				}
+			}
+			
+			if(touchPos.x >= settingsBtnX && touchPos.x <= settingsBtnX+44) {
+				if(touchPos.y >= settingsBtnY && touchPos.y <= settingsBtnY+44) {
+					//System.out.println("Settings button triggered!");
+					game.gSettings = new SettingsScreen(game);
+					game.setScreen(game.gSettings);
 					dispose();
 				}
 			}
