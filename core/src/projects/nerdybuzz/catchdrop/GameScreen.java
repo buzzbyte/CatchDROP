@@ -49,7 +49,6 @@ public class GameScreen implements Screen {
 
 	private Vector3 touchPos;
 	private Vector3 mousePos;
-	private boolean rightButtonPressed;
 	private boolean bucketTouched = false;
 	
 	private BitmapFont scoreFont;
@@ -77,7 +76,6 @@ public class GameScreen implements Screen {
 		
 		touchPos = new Vector3();
 		mousePos = new Vector3();
-		rightButtonPressed = Gdx.input.isButtonPressed(1);
 		
 		tempHighscore = game.getHighscore();
 		burntToastScore = MathUtils.random(20, 30);
@@ -161,7 +159,6 @@ public class GameScreen implements Screen {
 	
 	public void update(float delta) {
 		if(!game.paused) {
-			rightButtonPressed = Gdx.input.isButtonPressed(1);
 			if(Gdx.input.isTouched()) {
 				touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 				camera.unproject(touchPos);
@@ -231,8 +228,6 @@ public class GameScreen implements Screen {
 					}
 					game.score++;
 					if(game.score > tempHighscore) tempHighscore = game.score;
-					//if(iter.hasNext())
-					//	iter.remove();
 				}
 			}
 			
@@ -312,37 +307,28 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
 		game.resize(width, height);
 	}
 
 	@Override
-	public void show() {
-		// TODO Auto-generated method stub
-	}
+	public void show() {}
 
 	@Override
-	public void hide() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void hide() {}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
 		Gdx.input.setCursorPosition((int)game.GAME_WIDTH/2, (int)game.GAME_HEIGHT/2);
 		game.paused = true;
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
 		game.paused = false;
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		Texture[] disposableTextures = {dropImg, bucketImg};
 		for(Texture disposable : disposableTextures) {
 			disposable.dispose();

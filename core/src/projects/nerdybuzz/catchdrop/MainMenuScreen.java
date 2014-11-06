@@ -17,7 +17,6 @@ public class MainMenuScreen implements Screen {
 	
 	CharSequence welcomeText = "CatchDROP";
 	CharSequence optionText1;
-	private String optionText2;
 	CharSequence ghscoreText;
 	CharSequence promptText1;
 	private BitmapFont welcomeFont;
@@ -54,7 +53,6 @@ public class MainMenuScreen implements Screen {
 		}
 		
 		optionText1 = "Auto-Pause: " + game.autoPauseStr + " (P)";
-		optionText2 = "Dragging: " + game.dragStr + " (D)";
 		ghscoreText = "Highscore: " + game.getHighscore();
 		
 		welcomeFont = game.assManager.get("title.ttf", BitmapFont.class);
@@ -65,7 +63,6 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
@@ -96,8 +93,6 @@ public class MainMenuScreen implements Screen {
 	
 	public void update(float delta) {
 		optionText1 = "Auto-Pause: " + game.autoPauseStr + " (P)";
-		optionText2 = "Dragging: " + game.dragStr + " (D)";
-		
 		if(Gdx.input.isTouched()) {
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
@@ -127,37 +122,21 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
 		game.resize(width, height);
 	}
 
 	@Override
-	public void show() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void show() {}
 
 	@Override
-	public void hide() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void hide() {}
 
 	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void pause() {}
 
 	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void resume() {}
 
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void dispose() {}
 }

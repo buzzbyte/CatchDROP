@@ -1,15 +1,14 @@
 package projects.nerdybuzz.catchdrop;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -20,8 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 public class SettingsScreen implements Screen {
 	final CDGame game;
@@ -35,7 +32,6 @@ public class SettingsScreen implements Screen {
 	private TextButton autoPauseSetting;
 	private Table table;
 	private Texture pixtexture;
-	private ChangeEvent autoPauseEvent;
 	private Pixmap pixmap;
 	
 	private Screen backScreen;
@@ -89,8 +85,6 @@ public class SettingsScreen implements Screen {
 		if(game.autoPause) autoPauseSetting.setChecked(true); else autoPauseSetting.setChecked(false);
 		TextButton backBtn = new TextButton("Back", skin);
 		
-		autoPauseEvent = new ChangeEvent();
-		
 		autoPauseSetting.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -106,10 +100,7 @@ public class SettingsScreen implements Screen {
 		backBtn.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				// TODO Auto-generated method stub
-				//game.setScreen(new MainMenuScreen(game));
 				game.setScreen(backScreen);
-				//dispose();
 			}
 		});
 		
@@ -129,20 +120,11 @@ public class SettingsScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(0, 0, 0.1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 		stage.draw();
-		
-		/*
-		game.shapeRender.setProjectionMatrix(camera.combined);
-		game.shapeRender.begin(ShapeType.Line);
-		game.shapeRender.setColor(Color.BLACK);
-		game.shapeRender.rect(autoPauseSetting.getX(), autoPauseSetting.getY(), autoPauseSetting.getWidth(), autoPauseSetting.getHeight());
-		game.shapeRender.end();
-		// */
 		
 		update(delta);
 	}
@@ -163,36 +145,23 @@ public class SettingsScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
 		stage.getViewport().update(width, height, true);
 	}
 
 	@Override
-	public void show() {
-		// TODO Auto-generated method stub
-	}
+	public void show() {}
 
 	@Override
-	public void hide() {
-		// TODO Auto-generated method stub
-	}
+	public void hide() {}
 
 	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void pause() {}
 
 	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void resume() {}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		//pixtexture.dispose();
 		skin.dispose();
 		stage.dispose();
 	}

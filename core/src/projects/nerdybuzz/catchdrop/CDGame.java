@@ -6,10 +6,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -106,31 +103,6 @@ public class CDGame extends Game {
 		headerParams.fontParameters.size = 50;
 		assManager.load("heading.ttf", BitmapFont.class, headerParams); 
 		
-		/*
-		if(Gdx.files.internal("data.json").exists()) {
-			System.out.println("Data file exists!");
-			
-			//gameJson = new JSONObject(Gdx.files.internal("data.json"));
-			JSONParser jsonParser = new JSONParser();
-			try {
-				Object dataJson = jsonParser.parse(Gdx.files.internal("data.json").reader());
-				JSONObject dataObj = (JSONObject) dataJson;
-				JSONObject jsonHighScore = (JSONObject) dataObj.get("classic_mode");
-				highScore = (Long) jsonHighScore.get("highscore");
-				System.out.println("Strored Highscore: " + jsonHighScore.get("highscore"));
-				System.out.println("Highscore: " + highScore);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-			System.out.println("'data.json' does not exist in assets directory. Starting game with defaults (e.g. no highscore saving)...");
-		}
-		// */
-		
 		if(usingDesktop) autoPause = false;
 		
 		gamePrefs = Gdx.app.getPreferences("Game");
@@ -183,30 +155,6 @@ public class CDGame extends Game {
 	}
 	
 	public void setHighscore(long highscore) {
-		/*
-		if(Gdx.files.internal("data.json").exists()) {
-			JSONParser jsonParser = new JSONParser();
-			try {
-				Object dataJson = jsonParser.parse(Gdx.files.internal("data.json").reader());
-				JSONObject dataObj = (JSONObject) dataJson;
-				JSONObject jsonHighScore = (JSONObject) dataObj.get("classic_mode");
-				jsonHighScore.put("highscore", highscore);
-				highScore = highscore;
-				/*
-				FileWriter dataWriter = new FileWriter(Gdx.files.internal("data.json").file());
-				dataWriter.write(dataObj.toJSONString());
-				dataWriter.flush();
-				dataWriter.close();
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		// */
 		gamePrefs.putLong("highscore", highscore);
 		highScore = highscore;
 		gamePrefs.flush();
