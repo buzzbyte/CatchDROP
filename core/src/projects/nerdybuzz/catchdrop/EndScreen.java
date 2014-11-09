@@ -22,6 +22,7 @@ public class EndScreen implements Screen {
 	private BitmapFont mainFont;
 	private BitmapFont scoreFont;
 	private BitmapFont promptFont;
+	@SuppressWarnings("unused")
 	private BitmapFont cornerFont;
 	
 	private float bucketX;

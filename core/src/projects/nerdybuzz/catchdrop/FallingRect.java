@@ -3,13 +3,13 @@ package projects.nerdybuzz.catchdrop;
 import com.badlogic.gdx.math.Rectangle;
 
 public class FallingRect extends Rectangle {
+	private static final long serialVersionUID = 1L;
+	
 	public boolean loseOnMiss = false;
 	public int gainValue = 0;
 	public int loseValue = 0;
 	
-	public FallingRect() {
-		
-	}
+	public FallingRect() {}
 	
 	public FallingRect(float x, float y, float width, float height) {
 		super(x,y,width,height);

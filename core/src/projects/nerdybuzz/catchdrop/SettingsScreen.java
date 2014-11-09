@@ -30,11 +30,14 @@ public class SettingsScreen implements Screen {
 	private BitmapFont btnFont;
 	
 	private TextButton autoPauseSetting;
+	private TextButton dragSetting;
+	
 	private Table table;
 	private Texture pixtexture;
 	private Pixmap pixmap;
 	
 	private Screen backScreen;
+	private boolean shown = false;
 	
 	public SettingsScreen(final CDGame game) {
 		this.game = game;
@@ -82,17 +85,35 @@ public class SettingsScreen implements Screen {
 		
 		Label scrTitle = new Label("Game Settings", skin);
 		autoPauseSetting = new TextButton("Auto-Pause: "+game.autoPauseStr,skin);
+		dragSetting = new TextButton("Dragging: "+game.dragStr,skin);
 		if(game.autoPause) autoPauseSetting.setChecked(true); else autoPauseSetting.setChecked(false);
+		if(game.noDrag) dragSetting.setChecked(false); else dragSetting.setChecked(true);
 		TextButton backBtn = new TextButton("Back", skin);
 		
 		autoPauseSetting.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				System.out.println("Setting Clicked!");
-				if(game.autoPause) {
-					game.autoPause = false;
-				} else {
-					game.autoPause = true;
+				if(shown) {
+					System.out.println("Setting Clicked!");
+					if(game.autoPause) {
+						game.autoPause = false;
+					} else {
+						game.autoPause = true;
+					}
+				}
+			}
+		});
+		
+		dragSetting.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(shown) {
+					System.out.println("Setting Clicked!");
+					if(game.noDrag) {
+						game.noDrag = false;
+					} else {
+						game.noDrag = true;
+					}
 				}
 			}
 		});
@@ -100,7 +121,7 @@ public class SettingsScreen implements Screen {
 		backBtn.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(backScreen);
+				if(shown) game.setScreen(backScreen);
 			}
 		});
 		
@@ -109,6 +130,8 @@ public class SettingsScreen implements Screen {
 		table.row();
 		if(game.usingDesktop) {
 			table.add(autoPauseSetting).width(300).height(50).pad(5);
+			table.row();
+			table.add(dragSetting).width(300).height(50).pad(5);
 			table.row();
 		}
 		table.add(backBtn).width(300).height(50).pad(5);
@@ -120,20 +143,30 @@ public class SettingsScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0, 0, 0.1f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-		stage.draw();
-		
-		update(delta);
+		if(shown) {
+			Gdx.gl.glClearColor(0, 0, 0.1f, 1);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			
+			stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+			stage.draw();
+			
+			update(delta);
+		}
 	}
 	
 	public void update(float delta) {
 		autoPauseSetting.setText("Auto-Pause: "+game.autoPauseStr);
+		dragSetting.setText("Dragging: "+game.dragStr);
+		
+		if(game.autoPause) autoPauseSetting.setChecked(true); else autoPauseSetting.setChecked(false);
+		if(game.noDrag) dragSetting.setChecked(false); else dragSetting.setChecked(true);
 		
 		if(Gdx.input.isKeyJustPressed(Keys.P)) {
 			toggleAutoPause();
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.D)) {
+			toggleDragging();
 		}
 		
 		camera.update();
@@ -142,6 +175,10 @@ public class SettingsScreen implements Screen {
 	public void toggleAutoPause() {
 		if(game.autoPause) autoPauseSetting.setChecked(false); else autoPauseSetting.setChecked(true);
 	}
+	
+	public void toggleDragging() {
+		if(game.noDrag) dragSetting.setChecked(false); else dragSetting.setChecked(true);
+	}
 
 	@Override
 	public void resize(int width, int height) {
@@ -149,10 +186,16 @@ public class SettingsScreen implements Screen {
 	}
 
 	@Override
-	public void show() {}
+	public void show() {
+		shown = true;
+		System.out.println("Settings Shown.");
+	}
 
 	@Override
-	public void hide() {}
+	public void hide() {
+		shown = false;
+		System.out.println("Settings Hidden.");
+	}
 
 	@Override
 	public void pause() {}

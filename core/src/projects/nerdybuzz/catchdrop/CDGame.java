@@ -124,7 +124,8 @@ public class CDGame extends Game {
 	@Override
 	public void render() {
 		if(autoPause) autoPauseStr = "ON"; else autoPauseStr = "OFF";
-		if(!noDrag) dragStr = "ON"; else dragStr = "OFF";
+		if(noDrag) dragStr = "OFF"; else dragStr = "ON";
+		if(autoPause) noDrag = false;
 		if(assManager.update() && assManager.isLoaded("title.ttf")) {
 			super.render();
 		}
