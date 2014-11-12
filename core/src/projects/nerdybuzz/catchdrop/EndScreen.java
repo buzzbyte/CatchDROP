@@ -17,6 +17,7 @@ public class EndScreen implements Screen {
 	private CharSequence goverText = "GAME OVER";
 	CharSequence optionText1;
 	private CharSequence gscoreText;
+	private CharSequence gmissedText;
 	private String ghscoreText;
 	private CharSequence promptText1;
 	private BitmapFont mainFont;
@@ -53,6 +54,7 @@ public class EndScreen implements Screen {
 		}
 		
 		gscoreText = "Score: " + game.score;
+		gmissedText = "Missed: " + game.missedDrops;
 		ghscoreText = "Highscore: " + game.getHighscore();
 		promptText1 = game.callToAction + " the bucket to play again";
 		optionText1 = "Auto-Pause: " + game.autoPauseStr + " (P)";
@@ -85,9 +87,10 @@ public class EndScreen implements Screen {
 		mainFont.draw(game.batch, goverText.toString(), game.GAME_WIDTH/2-mainFont.getBounds(goverText).width/2, game.GAME_HEIGHT/2-mainFont.getBounds(goverText).height+200);
 		scoreFont.setColor(Color.YELLOW);
 		scoreFont.draw(game.batch, gscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(gscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(gscoreText).height+55);
-		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+20);
+		if(game.showMissedDrops) scoreFont.draw(game.batch, gmissedText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(gmissedText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(gmissedText).height+20);
+		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+(game.showMissedDrops ? -15 : 20));
 		promptFont.setColor(Color.WHITE);
-		promptFont.draw(game.batch, promptText1.toString(), game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
+		promptFont.draw(game.batch, promptText1.toString(), game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*(game.showMissedDrops ? 3 : 2));
 		//if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
 		game.batch.draw(settingsIcon, settingsBtnX, settingsBtnY, 44, 44);
 		game.batch.end();
@@ -105,7 +108,13 @@ public class EndScreen implements Screen {
 			if(touchPos.x >= bucketX && touchPos.x <= bucketX+64) {
 				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
 					game.score = 0;
-					game.setScreen(new GameScreen(game));
+					game.missedDrops = 0;
+					if(game.gScr instanceof ClassicGame) {
+						game.setScreen(new ClassicGame(game));
+					} else if(game.gScr instanceof ZenGame) {
+						game.setScreen(new ZenGame(game));
+					}
+					
 					dispose();
 				}
 			}

@@ -38,6 +38,9 @@ public class SettingsScreen implements Screen {
 	
 	private Screen backScreen;
 	private boolean shown = false;
+	private TextButton gameModeSetting;
+	
+	private int gmIndex = 0;
 	
 	public SettingsScreen(final CDGame game) {
 		this.game = game;
@@ -84,11 +87,35 @@ public class SettingsScreen implements Screen {
 		skin.add("default", btnStyle);
 		
 		Label scrTitle = new Label("Game Settings", skin);
+		gameModeSetting = new TextButton("Game Mode: "+game.gameModeStr,skin);
 		autoPauseSetting = new TextButton("Auto-Pause: "+game.autoPauseStr,skin);
 		dragSetting = new TextButton("Dragging: "+game.dragStr,skin);
 		if(game.autoPause) autoPauseSetting.setChecked(true); else autoPauseSetting.setChecked(false);
 		if(game.noDrag) dragSetting.setChecked(false); else dragSetting.setChecked(true);
 		TextButton backBtn = new TextButton("Back", skin);
+		
+		gameModeSetting.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(shown) {
+					System.out.println("Setting Clicked!");
+					GameScreen[] gameModes = {
+							new ZenGame(game),
+							new ClassicGame(game)
+					};
+					
+					if(gmIndex>gameModes.length-1) {
+						gmIndex = 0;
+					}
+					game.gScr = gameModes[gmIndex];
+					gmIndex++;
+					
+					System.out.println("Game mode index: "+gmIndex);
+					System.out.println("Game mode: "+game.gameModeStr);
+					System.out.println("Game mode: "+game.gScr);
+				}
+			}
+		});
 		
 		autoPauseSetting.addListener(new ChangeListener() {
 			@Override
@@ -128,6 +155,8 @@ public class SettingsScreen implements Screen {
 		table = new Table();
 		table.add(scrTitle).pad(10);
 		table.row();
+		table.add(gameModeSetting).width(300).height(50).pad(5);
+		table.row();
 		if(game.usingDesktop) {
 			table.add(autoPauseSetting).width(300).height(50).pad(5);
 			table.row();
@@ -155,6 +184,7 @@ public class SettingsScreen implements Screen {
 	}
 	
 	public void update(float delta) {
+		gameModeSetting.setText("Game Mode: "+game.gameModeStr);
 		autoPauseSetting.setText("Auto-Pause: "+game.autoPauseStr);
 		dragSetting.setText("Dragging: "+game.dragStr);
 		

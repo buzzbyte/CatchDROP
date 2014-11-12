@@ -38,8 +38,9 @@ public class GameScreen implements Screen {
 	private long delay = 100;
 	private long delayTimer = delay;
 	
-	private boolean spawnDrops = true;
-	private boolean spawnBurntToast = true;
+	protected boolean spawnDrops = true;
+	protected boolean spawnBurntToast = true;
+	protected boolean loseOnMissedDrop = true;
 	
 	private CharSequence pauseText = "PAUSED";
 	private CharSequence pausePromptText;
@@ -51,12 +52,15 @@ public class GameScreen implements Screen {
 	private Vector3 mousePos;
 	private boolean bucketTouched = false;
 	
+	private BitmapFont timerFont;
 	private BitmapFont scoreFont;
 	private BitmapFont mainFont;
 	private BitmapFont cornerFont;
 
 	private int burntToastScore;
 	private boolean burntToastExists;
+	
+	protected int timerTime;
 	
 	public GameScreen(final CDGame game) {
 		this.game = game;
@@ -69,6 +73,7 @@ public class GameScreen implements Screen {
 			game.assManager.finishLoading();
 		}
 		
+		timerFont = game.assManager.get("timer.ttf", BitmapFont.class);
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
 		mainFont = game.assManager.get("prompt.ttf", BitmapFont.class);
 		cornerFont = game.assManager.get("corner.ttf", BitmapFont.class);
@@ -109,9 +114,16 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
+		//timerFont.setColor(Color.WHITE);
+		if(game.gScr instanceof ZenGame) {
+			if(timerTime<=5) timerFont.setColor(Color.RED);
+			else timerFont.setColor(Color.WHITE);
+			timerFont.draw(game.batch, game.secondsToTime(timerTime, false), game.GAME_WIDTH-130, game.GAME_HEIGHT-10);
+		}
 		scoreFont.setColor(Color.YELLOW);
 		scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
-		scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-40);
+		if (game.showMissedDrops) scoreFont.draw(game.batch, "Missed: "+game.missedDrops, 10, game.GAME_HEIGHT-40);
+		scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
 		game.batch.end();
 		
 		if(!game.paused) {
@@ -208,8 +220,11 @@ public class GameScreen implements Screen {
 					} catch (ArrayIndexOutOfBoundsException e) {
 						e.printStackTrace();
 					}
-					game.setScreen(new EndScreen(game));
-					dispose();
+					if(loseOnMissedDrop) {
+						game.setScreen(new EndScreen(game));
+						dispose();
+					}
+					game.missedDrops++;
 				}
 				if(raindrop.overlaps(ground)) {
 					try {
@@ -217,8 +232,11 @@ public class GameScreen implements Screen {
 					} catch (ArrayIndexOutOfBoundsException e) {
 						e.printStackTrace();
 					}
-					game.setScreen(new EndScreen(game));
-					dispose();
+					if(loseOnMissedDrop) {
+						game.setScreen(new EndScreen(game));
+						dispose();
+					}
+					game.missedDrops++;
 				}
 				if(raindrop.overlaps(bucket)) {
 					try {

@@ -99,7 +99,14 @@ public class MainMenuScreen implements Screen {
 			
 			if(touchPos.x >= bucketX && touchPos.x <= bucketX+64) {
 				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
-					game.setScreen(game.gScr);
+					game.score = 0;
+					game.missedDrops = 0;
+					if(game.gScr instanceof ClassicGame) {
+						game.setScreen(new ClassicGame(game));
+					} else if(game.gScr instanceof ZenGame) {
+						game.setScreen(new ZenGame(game));
+					}
+					
 					dispose();
 				}
 			}

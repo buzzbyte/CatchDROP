@@ -35,6 +35,8 @@ public class CDGame extends Game {
 	public boolean autoPause = true;
 	public String autoPauseStr;
 	public int score = 0;
+	public int missedDrops = 0;
+	public boolean showMissedDrops = false;
 	public long highScore;
 	public FreeTypeFontGenerator generator;
 	public FreeTypeFontParameter parameter;
@@ -44,6 +46,7 @@ public class CDGame extends Game {
 	public boolean usingDesktop;
 	public boolean noDrag;
 	public String dragStr;
+	public String gameModeStr;
 
 	public boolean initedSettings = false;
 	
@@ -87,6 +90,11 @@ public class CDGame extends Game {
 		scoreParams1.fontParameters.size = 27;
 		assManager.load("score.ttf", BitmapFont.class, scoreParams1);
 		
+		FreeTypeFontLoaderParameter timerParams = new FreeTypeFontLoaderParameter();
+		timerParams.fontFileName = "font/arial.ttf";
+		timerParams.fontParameters.size = 45;
+		assManager.load("timer.ttf", BitmapFont.class, timerParams);
+		
 		FreeTypeFontLoaderParameter goverParams = new FreeTypeFontLoaderParameter();
 		goverParams.fontFileName = "font/arial.ttf";
 		goverParams.fontParameters.size = 85;
@@ -115,7 +123,7 @@ public class CDGame extends Game {
 		camera.setToOrtho(false, GAME_WIDTH, GAME_HEIGHT);
 		
 		mMScr = new MainMenuScreen(this);
-		gScr = new GameScreen(this);
+		gScr = new ClassicGame(this);
 		//gSettings = new SettingsScreen(this);
 		
 		this.setScreen(mMScr);
@@ -126,6 +134,13 @@ public class CDGame extends Game {
 		if(autoPause) autoPauseStr = "ON"; else autoPauseStr = "OFF";
 		if(noDrag) dragStr = "OFF"; else dragStr = "ON";
 		if(autoPause) noDrag = false;
+		if(gScr instanceof ClassicGame) {
+			gameModeStr = "Classic";
+		} else if(gScr instanceof ZenGame) {
+			gameModeStr = "Zen";
+		} else {
+			gameModeStr = "Classic?";
+		}
 		if(assManager.update() && assManager.isLoaded("title.ttf")) {
 			super.render();
 		}
@@ -165,6 +180,17 @@ public class CDGame extends Game {
 	public void dispose() {
 		batch.dispose();
 		assManager.dispose();
+	}
+	
+	public String secondsToTime(int insec, boolean includeHours) {
+		int hours, minutes, seconds;
+		String returned;
+		hours = insec / 3600;
+		minutes = (insec / 60) % 60;
+		seconds = insec % 60;
+		if(includeHours) returned = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
+		else returned = String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
+		return returned;
 	}
 }
 
