@@ -7,6 +7,7 @@ public class ClassicGame extends GameScreen {
 		game.showMissedDrops = false;
 		loseOnMissedDrop = true;
 		spawnBurntToast = true;
+		game.showZenScores = false;
 	}
 
 }

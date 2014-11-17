@@ -18,6 +18,7 @@ public class MainMenuScreen implements Screen {
 	CharSequence welcomeText = "CatchDROP";
 	CharSequence optionText1;
 	CharSequence ghscoreText;
+	CharSequence ghzenscoreText;
 	CharSequence promptText1;
 	private BitmapFont welcomeFont;
 	private BitmapFont scoreFont;
@@ -53,7 +54,8 @@ public class MainMenuScreen implements Screen {
 		}
 		
 		optionText1 = "Auto-Pause: " + game.autoPauseStr + " (P)";
-		ghscoreText = "Highscore: " + game.getHighscore();
+		ghscoreText = "Classic Highscore: " + game.getHighscore();
+		ghzenscoreText = "Zen Highscore: " + game.getZenHighscore();
 		
 		welcomeFont = game.assManager.get("title.ttf", BitmapFont.class);
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
@@ -83,9 +85,10 @@ public class MainMenuScreen implements Screen {
 		scoreFont.setColor(Color.YELLOW);
 		//if(game.usingDesktop) scoreFont.draw(game.batch, optionText1.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(optionText1).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(optionText1).height+55);
 		scoreFont.draw(game.batch, ghscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghscoreText).height+25);
+		scoreFont.draw(game.batch, ghzenscoreText.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(ghzenscoreText).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(ghzenscoreText).height-15);
 		promptFont.setColor(Color.WHITE);
-		promptFont.draw(game.batch, promptText1, game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*2);
-		game.batch.draw(settingsIcon, settingsBtnX, settingsBtnY, 44, 44);
+		promptFont.draw(game.batch, promptText1, game.GAME_WIDTH/2-promptFont.getBounds(promptText1).width/2, game.GAME_HEIGHT/2-promptFont.getBounds(promptText1).height*4);
+		game.batch.draw(settingsIcon, settingsBtnX, settingsBtnY, 64, 64);
 		game.batch.end();
 		
 		update(Gdx.graphics.getDeltaTime());
@@ -111,8 +114,8 @@ public class MainMenuScreen implements Screen {
 				}
 			}
 			
-			if(touchPos.x >= settingsBtnX && touchPos.x <= settingsBtnX+44) {
-				if(touchPos.y >= settingsBtnY && touchPos.y <= settingsBtnY+44) {
+			if(touchPos.x >= settingsBtnX && touchPos.x <= settingsBtnX+64) {
+				if(touchPos.y >= settingsBtnY && touchPos.y <= settingsBtnY+64) {
 					//System.out.println("Settings button triggered!");
 					game.gSettings = new SettingsScreen(game);
 					game.setScreen(game.gSettings);

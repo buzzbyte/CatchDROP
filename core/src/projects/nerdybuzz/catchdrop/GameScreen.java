@@ -25,20 +25,19 @@ public class GameScreen implements Screen {
 	
 	private Texture bucketImg;
 	private Texture dropImg;
-	private Texture burntToastImg;
+	//private Texture burntToastImg;
 	
-	private Rectangle bucket;
-	private Rectangle ground;
-	private Array<Rectangle> raindrops;
-	private Array<FallingRect> fallingObjects;
-	private FallingRect burntToast;
+	protected Rectangle bucket;
+	protected Rectangle ground;
+	protected Array<Rectangle> raindrops;
+	protected Array<FallingRect> fallingObjects;
+	protected FallingRect burntToast;
 	
-	private long lastTimeDropped;
-	private long rainTimer = 1000;
-	private long delay = 100;
-	private long delayTimer = delay;
+	protected long lastTimeDropped;
+	protected long rainTimer = 1000;
+	protected long delay = 100;
+	protected long delayTimer = delay;
 	
-	protected boolean spawnDrops = true;
 	protected boolean spawnBurntToast = true;
 	protected boolean loseOnMissedDrop = true;
 	
@@ -47,6 +46,7 @@ public class GameScreen implements Screen {
 	private CharSequence optionText1;
 	private String optionText2;
 	private long tempHighscore;
+	private long tempZenHighscore;
 
 	private Vector3 touchPos;
 	private Vector3 mousePos;
@@ -59,8 +59,6 @@ public class GameScreen implements Screen {
 
 	private int burntToastScore;
 	private boolean burntToastExists;
-	
-	protected int timerTime;
 	
 	public GameScreen(final CDGame game) {
 		this.game = game;
@@ -83,25 +81,24 @@ public class GameScreen implements Screen {
 		mousePos = new Vector3();
 		
 		tempHighscore = game.getHighscore();
+		tempZenHighscore = game.getZenHighscore();
 		burntToastScore = MathUtils.random(20, 30);
 		System.out.println(burntToastScore);
 		
 		bucketImg = new Texture(Gdx.files.internal("bucket.png"));
 		dropImg = new Texture(Gdx.files.internal("drop.png"));
-		burntToastImg = new Texture(Gdx.files.internal("burntToast.jpg"));
-		//bucketImg = new Texture("sprites/bucket.png");
-		//dropImg = new Texture("sprites/drop.png");
+		//burntToastImg = new Texture(Gdx.files.internal("burntToast.jpg"));
 		
 		bucket = new Rectangle(game.GAME_WIDTH/2-64/2, 20, 64, 64);
 		ground = new Rectangle(0, 0, game.GAME_WIDTH, bucket.y);
 		raindrops = new Array<Rectangle>();
 		fallingObjects = new Array<FallingRect>();
-		burntToast = new FallingRect(MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, 64, 64, false, 10, 0);
-		//spawnRaindrop();
+		//burntToast = new FallingRect(MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, 64, 64, false, 10, 0, new Texture("burntToast.jpg"));
+		burntToast = new BurntToastObj(game);
 	}
 
 	private void spawnRaindrop() {
-		if(spawnDrops && !burntToastExists) {
+		if(game.spawnDrops && !burntToastExists) {
 			Rectangle raindrop = new Rectangle(MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, 64, 64);
 			raindrops.add(raindrop);
 			lastTimeDropped = TimeUtils.nanoTime();
@@ -116,14 +113,16 @@ public class GameScreen implements Screen {
 		game.batch.begin();
 		//timerFont.setColor(Color.WHITE);
 		if(game.gScr instanceof ZenGame) {
-			if(timerTime<=5) timerFont.setColor(Color.RED);
+			if(game.timerTime<=5) timerFont.setColor(Color.RED);
 			else timerFont.setColor(Color.WHITE);
-			timerFont.draw(game.batch, game.secondsToTime(timerTime, false), game.GAME_WIDTH-130, game.GAME_HEIGHT-10);
+			timerFont.draw(game.batch, game.secondsToTime(game.timerTime, false), game.GAME_WIDTH-130, game.GAME_HEIGHT-10);
 		}
 		scoreFont.setColor(Color.YELLOW);
-		scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
+		if(!game.showZenScores) scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
+		else scoreFont.draw(game.batch, "Score: "+game.zenScore, 10, game.GAME_HEIGHT-10);
 		if (game.showMissedDrops) scoreFont.draw(game.batch, "Missed: "+game.missedDrops, 10, game.GAME_HEIGHT-40);
-		scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
+		if(!game.showZenScores) scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
+		else scoreFont.draw(game.batch, "Highscore: "+tempZenHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
 		game.batch.end();
 		
 		if(!game.paused) {
@@ -139,14 +138,20 @@ public class GameScreen implements Screen {
 			for(Rectangle raindrop : raindrops) {
 				game.batch.draw(dropImg, raindrop.x, raindrop.y);
 			}
+			
+			for(FallingRect fallingObject : fallingObjects) {
+				game.batch.draw(fallingObject.getImg(), fallingObject.x, fallingObject.y, fallingObject.width, fallingObject.height);
+			}
 			/*
 			if(spawnBurntToast) {
 				game.batch.draw(burntToastImg, burntToast.x, burntToast.y);
 			}
 			// */
+			/*
 			if(fallingObjects.contains(burntToast, false)) {
 				game.batch.draw(burntToastImg, fallingObjects.get(fallingObjects.indexOf(burntToast, false)).getX(), fallingObjects.get(fallingObjects.indexOf(burntToast, false)).getY(), 64, 64);
 			}
+			// */
 			if(!game.autoPause) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
 			game.batch.end();
 		} else {
@@ -215,37 +220,30 @@ public class GameScreen implements Screen {
 				Rectangle raindrop = iter.next();
 				raindrop.y -= 210*delta;
 				if(raindrop.y+64 < 0) {
-					try {
-						iter.remove();
-					} catch (ArrayIndexOutOfBoundsException e) {
-						e.printStackTrace();
-					}
 					if(loseOnMissedDrop) {
 						game.setScreen(new EndScreen(game));
 						dispose();
 					}
 					game.missedDrops++;
+					if(game.gScr instanceof ZenGame) updateZenTotal();
+					iter.remove(); continue;
 				}
 				if(raindrop.overlaps(ground)) {
-					try {
-						iter.remove();
-					} catch (ArrayIndexOutOfBoundsException e) {
-						e.printStackTrace();
-					}
 					if(loseOnMissedDrop) {
 						game.setScreen(new EndScreen(game));
 						dispose();
 					}
 					game.missedDrops++;
+					if(game.gScr instanceof ZenGame) updateZenTotal();
+					iter.remove(); continue;
 				}
 				if(raindrop.overlaps(bucket)) {
-					try {
-						iter.remove();
-					} catch (ArrayIndexOutOfBoundsException e) {
-						e.printStackTrace();
-					}
-					game.score++;
+					if(game.gScr instanceof ZenGame) game.zenScore++;
+					else game.score++;
+					if(game.gScr instanceof ZenGame) updateZenTotal();
 					if(game.score > tempHighscore) tempHighscore = game.score;
+					if(game.zenTotal > tempZenHighscore) tempZenHighscore = game.zenTotal;
+					iter.remove(); continue;
 				}
 			}
 			
@@ -254,13 +252,15 @@ public class GameScreen implements Screen {
 				FallingRect fallingObject = fallingIter.next();
 				fallingObject.y -= 210*delta;
 				if(fallingObject.y+64 < 0) {
-					fallingIter.remove();
 					if(fallingObject.loseOnMiss) {
 						System.out.println("Missed Object!!");
 						game.setScreen(new EndScreen(game));
 						dispose();
 					}
 					burntToastExists = false;
+					fallingObject.onMiss();
+					updateZenTotal();
+					fallingIter.remove(); continue;
 				}
 				if(fallingObject.overlaps(ground)) {
 					if(fallingObject.loseOnMiss) {
@@ -269,14 +269,17 @@ public class GameScreen implements Screen {
 						dispose();
 					}
 					burntToastExists = false;
-					fallingIter.remove();
+					fallingObject.onMiss();
+					updateZenTotal();
+					fallingIter.remove(); continue;
 				}
 				if(fallingObject.overlaps(bucket)) {
-					fallingIter.remove();
 					burntToastExists = false;
-					game.score -= fallingObject.loseValue;
-					game.score += fallingObject.gainValue;
+					fallingObject.onGet();
+					updateZenTotal();
 					if(game.score > tempHighscore) tempHighscore = game.score;
+					if(game.zenTotal > tempZenHighscore) tempZenHighscore = game.zenTotal;
+					fallingIter.remove(); continue;
 				}
 			}
 			
@@ -320,7 +323,16 @@ public class GameScreen implements Screen {
 				}
 			}
 		}
+		
 		camera.update();
+	}
+	
+	public void updateZenTotal() {
+		if(game.missedDrops < game.zenScore) {
+			game.zenTotal = game.zenScore - game.missedDrops;
+		} else {
+			game.zenTotal = game.zenScore;
+		}
 	}
 
 	@Override

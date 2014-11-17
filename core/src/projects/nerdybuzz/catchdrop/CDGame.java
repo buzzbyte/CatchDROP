@@ -17,8 +17,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoa
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class CDGame extends Game {
-	//public static final String GAME_VERSION = "v2.0-alpha";
-	public static final String GAME_VERSION = "testing-alpha";
+	public static final String GAME_VERSION = "v0.3.0 (alpha)";
+	//public static final String GAME_VERSION = "testing-alpha";
 	
 	public final int GAME_WIDTH  = 800;
 	public final int GAME_HEIGHT = 480;
@@ -35,9 +35,13 @@ public class CDGame extends Game {
 	public boolean autoPause = true;
 	public String autoPauseStr;
 	public int score = 0;
+	public int zenScore = 0;
+	public int zenTotal = 0;
 	public int missedDrops = 0;
 	public boolean showMissedDrops = false;
 	public long highScore;
+	public long zenHighScore;
+	public boolean showZenScores = false;
 	public FreeTypeFontGenerator generator;
 	public FreeTypeFontParameter parameter;
 	public AssetManager assManager;
@@ -47,6 +51,8 @@ public class CDGame extends Game {
 	public boolean noDrag;
 	public String dragStr;
 	public String gameModeStr;
+	public int timerTime;
+	public boolean spawnDrops = true;
 
 	public boolean initedSettings = false;
 	
@@ -173,6 +179,16 @@ public class CDGame extends Game {
 	public void setHighscore(long highscore) {
 		gamePrefs.putLong("highscore", highscore);
 		highScore = highscore;
+		gamePrefs.flush();
+	}
+	
+	public long getZenHighscore() {
+		return gamePrefs.getLong("zen-highscore", 0);
+	}
+	
+	public void setZenHighscore(long highscore) {
+		gamePrefs.putLong("zen-highscore", highscore);
+		zenHighScore = highscore;
 		gamePrefs.flush();
 	}
 	
