@@ -1,5 +1,9 @@
 package projects.nerdybuzz.catchdrop;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -8,8 +12,13 @@ public class ZenGame extends GameScreen {
 	public long nowTimeInSeconds;
 	
 	public FallingRect timePowerUp;
+	private PoisonDrop poisonDrop;
 	private boolean spawnedTimePowerUp = false;
 	private int randomNumber1;
+	private int randomNumber2;
+	public static boolean spawnedPoisonDrop = false;
+	public static boolean activePoisonDrop = false;
+	public boolean poisonSpawnTimed;
 
 	public ZenGame(CDGame game) {
 		super(game);
@@ -22,18 +31,24 @@ public class ZenGame extends GameScreen {
 		lastTimeInSeconds = nowTimeInSeconds;
 				
 		timePowerUp = new TimePowerUp(game);
+		poisonDrop = new PoisonDrop(game, MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, timerFont);
 		
 		randomNumber1 = MathUtils.random(-5, 5);
+		randomNumber2 = MathUtils.random(45, 55);
+		poisonSpawnTimed = true;
+		//randomNumber2 = 50;
 		System.out.println("power-up spawning: "+randomNumber1);
+		System.out.println("poison spawning: "+randomNumber2);
 	}
 	
 	public void render(float delta) {
 		super.render(delta);
-		
+		poisonDrop.render(delta);
 	}
 	
 	public void update(float delta) {
 		super.update(delta);
+		poisonDrop.update(delta);
 		nowTimeInSeconds = TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000;
 		if(!game.paused) {
 			if(lastTimeInSeconds != nowTimeInSeconds) {
@@ -54,6 +69,20 @@ public class ZenGame extends GameScreen {
 		if(randomNumber1 == game.timerTime && game.spawnDrops && !spawnedTimePowerUp) {
 			fallingObjects.add(timePowerUp);
 			spawnedTimePowerUp = true;
+		}
+		
+		if(!spawnedPoisonDrop && !activePoisonDrop && !poisonSpawnTimed) {
+			randomNumber2 = MathUtils.random(game.timerTime-10, game.timerTime);
+			poisonSpawnTimed = true;
+			System.out.println("poison spawning: "+randomNumber2);
+		}
+		
+		if(randomNumber2 == game.timerTime && game.spawnDrops && !activePoisonDrop && !spawnedPoisonDrop && poisonSpawnTimed) {
+			poisonDrop = new PoisonDrop(game, MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, timerFont);
+			fallingObjects.add(poisonDrop);
+			spawnedPoisonDrop = true;
+			//activePoisonDrop = true;
+			poisonSpawnTimed = false;
 		}
 	}
 

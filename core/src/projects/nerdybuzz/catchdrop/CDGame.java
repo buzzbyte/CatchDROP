@@ -17,8 +17,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoa
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class CDGame extends Game {
-	public static final String GAME_VERSION = "v0.3.0 (alpha)";
-	//public static final String GAME_VERSION = "testing-alpha";
+	//public static final String GAME_VERSION = "v0.3.0 (alpha)";
+	public static final String GAME_VERSION = "testing-alpha";
 	
 	public final int GAME_WIDTH  = 800;
 	public final int GAME_HEIGHT = 480;

@@ -11,6 +11,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -27,11 +30,13 @@ public class GameScreen implements Screen {
 	private Texture dropImg;
 	//private Texture burntToastImg;
 	
-	protected Rectangle bucket;
+	protected static Rectangle bucket;
 	protected Rectangle ground;
 	protected Array<Rectangle> raindrops;
 	protected Array<FallingRect> fallingObjects;
 	protected FallingRect burntToast;
+	
+	protected static boolean poisoned = false;
 	
 	protected long lastTimeDropped;
 	protected long rainTimer = 1000;
@@ -52,13 +57,24 @@ public class GameScreen implements Screen {
 	private Vector3 mousePos;
 	private boolean bucketTouched = false;
 	
-	private BitmapFont timerFont;
+	protected BitmapFont timerFont;
 	private BitmapFont scoreFont;
 	private BitmapFont mainFont;
 	private BitmapFont cornerFont;
 
 	private int burntToastScore;
 	private boolean burntToastExists;
+
+	private Texture cloudsTop;
+
+	private Texture cloudsBase;
+
+	private boolean triggerSplash = false;
+
+	public PooledEffect waterSplash;
+	private ParticleEffect waterSplashPE;
+	private ParticleEffectPool waterSplashPEP;
+	public static Array<PooledEffect> effects = new Array<PooledEffect>();
 	
 	public GameScreen(final CDGame game) {
 		this.game = game;
@@ -87,7 +103,15 @@ public class GameScreen implements Screen {
 		
 		bucketImg = new Texture(Gdx.files.internal("bucket.png"));
 		dropImg = new Texture(Gdx.files.internal("drop.png"));
+		cloudsTop = new Texture("clouds-top.png");
+		cloudsBase = new Texture("clouds-base.png");
 		//burntToastImg = new Texture(Gdx.files.internal("burntToast.jpg"));
+		
+		waterSplashPE = new ParticleEffect();
+		waterSplashPE.load(Gdx.files.internal("water-splash.p"), Gdx.files.internal(""));
+		waterSplashPEP = new ParticleEffectPool(waterSplashPE, 1, 2);
+		waterSplash = waterSplashPEP.obtain();
+		waterSplash.start();
 		
 		bucket = new Rectangle(game.GAME_WIDTH/2-64/2, 20, 64, 64);
 		ground = new Rectangle(0, 0, game.GAME_WIDTH, bucket.y);
@@ -107,7 +131,7 @@ public class GameScreen implements Screen {
 	
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
@@ -117,6 +141,7 @@ public class GameScreen implements Screen {
 			else timerFont.setColor(Color.WHITE);
 			timerFont.draw(game.batch, game.secondsToTime(game.timerTime, false), game.GAME_WIDTH-130, game.GAME_HEIGHT-10);
 		}
+		game.batch.draw(cloudsBase, 0, game.GAME_HEIGHT-(cloudsBase.getHeight()));
 		scoreFont.setColor(Color.YELLOW);
 		if(!game.showZenScores) scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
 		else scoreFont.draw(game.batch, "Score: "+game.zenScore, 10, game.GAME_HEIGHT-10);
@@ -134,7 +159,7 @@ public class GameScreen implements Screen {
 			
 			game.batch.setProjectionMatrix(camera.combined);
 			game.batch.begin();
-			game.batch.draw(bucketImg, bucket.x, bucket.y);
+			
 			for(Rectangle raindrop : raindrops) {
 				game.batch.draw(dropImg, raindrop.x, raindrop.y);
 			}
@@ -152,6 +177,25 @@ public class GameScreen implements Screen {
 				game.batch.draw(burntToastImg, fallingObjects.get(fallingObjects.indexOf(burntToast, false)).getX(), fallingObjects.get(fallingObjects.indexOf(burntToast, false)).getY(), 64, 64);
 			}
 			// */
+			/*
+			if(triggerSplash) {
+				System.out.println("Splash!");
+				waterSplash.draw(game.batch, delta);
+				if(waterSplash.isComplete()) {
+					waterSplash.reset();
+					triggerSplash = false;
+				}
+			}
+			// */
+			for (int i = effects.size - 1; i >= 0; i--) {
+			    PooledEffect effect = effects.get(i);
+			    effect.draw(game.batch, delta);
+			    if (effect.isComplete()) {
+			        effect.free();
+			        effects.removeIndex(i);
+			    }
+			}
+			game.batch.draw(bucketImg, bucket.x, bucket.y);
 			if(!game.autoPause) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
 			game.batch.end();
 		} else {
@@ -171,6 +215,11 @@ public class GameScreen implements Screen {
 			if(!game.autoPause) cornerFont.draw(game.batch, optionText2, 10, cornerFont.getBounds(optionText2).height+10);
 			game.batch.end();
 		}
+		game.batch.setProjectionMatrix(camera.combined);
+		game.batch.begin();
+		game.batch.draw(cloudsTop, 0, game.GAME_HEIGHT-(cloudsTop.getHeight()-10));
+		game.batch.end();
+		
 		update(delta);
 	}
 	
@@ -189,6 +238,7 @@ public class GameScreen implements Screen {
 				if(bucketTouched) {
 					bucket.x = touchPos.x-64/2;
 				}
+				waterSplash.setPosition(bucket.x, bucket.y+64);
 			} else {
 				if(game.noDrag && !game.autoPause) {
 					mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -196,6 +246,8 @@ public class GameScreen implements Screen {
 					bucket.x = mousePos.x-64/2;
 					Gdx.input.setCursorCatched(true);
 					//Gdx.input.setCursorPosition((int)mousePos.x, (int)bucket.y+game.GAME_HEIGHT-55);
+					waterSplash.setPosition(bucket.x, bucket.y+64);
+					waterSplash.update(delta);
 				} else {
 					bucketTouched = false;
 					if(game.autoPause) pause();
@@ -238,11 +290,20 @@ public class GameScreen implements Screen {
 					iter.remove(); continue;
 				}
 				if(raindrop.overlaps(bucket)) {
-					if(game.gScr instanceof ZenGame) game.zenScore++;
-					else game.score++;
+					if(poisoned) {
+						if(game.gScr instanceof ZenGame) game.zenScore--;
+						else game.score--;
+					} else {
+						if(game.gScr instanceof ZenGame) game.zenScore++;
+						else game.score++;
+					}
 					if(game.gScr instanceof ZenGame) updateZenTotal();
 					if(game.score > tempHighscore) tempHighscore = game.score;
 					if(game.zenTotal > tempZenHighscore) tempZenHighscore = game.zenTotal;
+					waterSplash.reset();
+					effects.add(waterSplash);
+					//triggerSplash = true;
+					//waterSplash.update(delta);
 					iter.remove(); continue;
 				}
 			}
@@ -363,6 +424,7 @@ public class GameScreen implements Screen {
 		for(Texture disposable : disposableTextures) {
 			disposable.dispose();
 		}
+		waterSplash.dispose();
 	}
 
 }
