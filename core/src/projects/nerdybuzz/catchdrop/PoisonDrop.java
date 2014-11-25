@@ -22,7 +22,7 @@ public class PoisonDrop extends FallingRect implements FallingAct {
 	private long nowTimeInSeconds;
 	private long lastTimeInSeconds;
 	private BitmapFont timerFont;
-
+	
 	public PoisonDrop(final CDGame game) {
 		super(game);
 		x = MathUtils.random(0, game.GAME_WIDTH-64);
@@ -111,6 +111,12 @@ public class PoisonDrop extends FallingRect implements FallingAct {
 	
 	public void onDispose() {
 		rectImg.dispose();
+		firePEffect.dispose();
+		fireEffect.dispose();
+	}
+	
+	public void dispose() {
+		onDispose();
 	}
 	
 	public void finish() {

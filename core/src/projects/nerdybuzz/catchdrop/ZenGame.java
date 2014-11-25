@@ -36,7 +36,6 @@ public class ZenGame extends GameScreen {
 		randomNumber1 = MathUtils.random(-5, 5);
 		randomNumber2 = MathUtils.random(45, 55);
 		poisonSpawnTimed = true;
-		//randomNumber2 = 50;
 		System.out.println("power-up spawning: "+randomNumber1);
 		System.out.println("poison spawning: "+randomNumber2);
 	}
@@ -81,9 +80,13 @@ public class ZenGame extends GameScreen {
 			poisonDrop = new PoisonDrop(game, MathUtils.random(0, game.GAME_WIDTH-64), game.GAME_HEIGHT, timerFont);
 			fallingObjects.add(poisonDrop);
 			spawnedPoisonDrop = true;
-			//activePoisonDrop = true;
 			poisonSpawnTimed = false;
 		}
+	}
+	
+	public void dispose() {
+		timePowerUp.dispose();
+		poisonDrop.dispose();
 	}
 
 }
