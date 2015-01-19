@@ -61,12 +61,12 @@ public class EndScreen implements Screen {
 		
 		if(game.score > game.getHighscore()) {
 			game.setHighscore(game.score);
-			gnewhighscoreText = "New Highscore!";
+			gnewhighscoreText = "New Classic Highscore!";
 		}
 		
 		if(game.zenTotal > game.getZenHighscore()) {
 			game.setZenHighscore(game.zenTotal);
-			gnewhighscoreText = "New Highscore!";
+			gnewhighscoreText = "New Zen Highscore!";
 		}
 		
 		if(game.missedDrops < game.zenScore) {
@@ -81,7 +81,7 @@ public class EndScreen implements Screen {
 		gtotalText = "Total: " + game.zenTotal;
 		ghscoreText = "Highscore: " + game.getHighscore();
 		ghzenscoreText = "Highscore: " + game.getZenHighscore();
-		promptText1 = game.callToAction + " the bucket to play again";
+		promptText1 = game.callToAction + " a bucket to play again";
 		optionText1 = "Auto-Pause: " + game.autoPauseStr + " (P)";
 		
 		if(!game.assManager.isLoaded("title.ttf")) {
@@ -107,7 +107,12 @@ public class EndScreen implements Screen {
 		
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
-		game.batch.draw(new Texture("bucket.png"), bucketX, bucketY);
+		game.batch.draw(new Texture("bucket-classic.png"), bucketX/2, bucketY); // Classic
+		game.batch.draw(new Texture("bucket-zen.png"), bucketX*1.5f, bucketY); // Zen
+		//scoreFont.setColor(Color.BLUE);
+		//scoreFont.draw(game.batch, game.classicText, (bucketX/2)-(scoreFont.getBounds(game.classicText).width/2), bucketY+40);
+		//scoreFont.setColor(Color.GREEN);
+		//scoreFont.draw(game.batch, game.zenText, (bucketX*1.5f)+(scoreFont.getBounds(game.zenText).width/2), bucketY+40);
 		promptFont.setColor(Color.GREEN);
 		promptFont.draw(game.batch, gnewhighscoreText.toString(), game.GAME_WIDTH/2-promptFont.getBounds(gnewhighscoreText).width/2, game.GAME_HEIGHT-30);
 		mainFont.setColor(Color.RED);
@@ -137,6 +142,15 @@ public class EndScreen implements Screen {
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
 			
+			if(game.gScr instanceof ClassicGame) {
+				game.classicText = "Play Again";
+				game.zenText = "Zen";
+			} else if(game.gScr instanceof ZenGame) {
+				game.classicText = "Classic";
+				game.zenText = "Play Again";
+			}
+			
+			/*
 			if(touchPos.x >= bucketX && touchPos.x <= bucketX+64) {
 				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
 					game.score = 0;
@@ -150,6 +164,33 @@ public class EndScreen implements Screen {
 						game.setScreen(new ZenGame(game));
 					}
 					
+					dispose();
+				}
+			}
+			// */
+			
+			if(touchPos.x >= bucketX/2 && touchPos.x <= bucketX/2+124) {
+				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
+					game.score = 0;
+					game.zenScore = 0;
+					game.zenTotal = 0;
+					game.missedDrops = 0;
+					game.gScr = new ClassicGame(game, (int)bucketX, false);
+					if(!game.spawnDrops) game.spawnDrops = true;
+					game.setScreen(new ClassicGame(game, (int)bucketX, true));
+					dispose();
+				}
+			}
+			
+			if(touchPos.x >= bucketX*1.5f && touchPos.x <= bucketX*1.5f+64) {
+				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
+					game.score = 0;
+					game.zenScore = 0;
+					game.zenTotal = 0;
+					game.missedDrops = 0;
+					game.gScr = new ZenGame(game, (int)bucketX, false);
+					if(!game.spawnDrops) game.spawnDrops = true;
+					game.setScreen(new ZenGame(game, (int)bucketX, true));
 					dispose();
 				}
 			}

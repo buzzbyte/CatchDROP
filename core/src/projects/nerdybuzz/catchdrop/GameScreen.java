@@ -1,6 +1,10 @@
 package projects.nerdybuzz.catchdrop;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
@@ -74,11 +78,40 @@ public class GameScreen implements Screen {
 	public PooledEffect waterSplash;
 	private ParticleEffect waterSplashPE;
 	private ParticleEffectPool waterSplashPEP;
+
+	private KeySequence konami;
+
+	private boolean doKonamiCheat = false;
+
+	private Integer[] konamiCode = {19, 19, 20, 20, 21, 22, 21, 22, 30, 29};
+
+	private ArrayList<Integer> konamiCodeList;
+
+	private int bucketX;
+	
 	public static Array<PooledEffect> effects = new Array<PooledEffect>();
+	
+	public GameScreen(final CDGame game, int bucketX) {
+		this.game = game;
+		//this.bucketX = bucketX;
+		initGame(bucketX);
+	}
+	
+	public GameScreen(final CDGame game, int bucketX, boolean bucketTouched) {
+		this.game = game;
+		//this.bucketX = bucketX;
+		this.bucketTouched = bucketTouched;
+		initGame(bucketX);
+	}
 	
 	public GameScreen(final CDGame game) {
 		this.game = game;
-		
+		this.bucketX = game.GAME_WIDTH/2-64/2;
+		initGame(bucketX);
+	}
+	// */
+	
+	public void initGame(int bucketX) {
 		pausePromptText = game.callToAction + " the bucket to resume";
 		optionText1 = "Pause (P)";
 		optionText2 = "Resume (P)";
@@ -113,7 +146,14 @@ public class GameScreen implements Screen {
 		waterSplash = waterSplashPEP.obtain();
 		waterSplash.start();
 		
-		bucket = new Rectangle(game.GAME_WIDTH/2-64/2, 20, 64, 64);
+		
+		konamiCodeList = new ArrayList<Integer>();
+		Collections.addAll(konamiCodeList, konamiCode);
+		konami = new KeySequence(konamiCodeList);
+		Gdx.input.setInputProcessor(konami);
+		// */
+		
+		bucket = new Rectangle(bucketX, 20, 64, 64);
 		ground = new Rectangle(0, 0, game.GAME_WIDTH, bucket.y);
 		raindrops = new Array<Rectangle>();
 		fallingObjects = new Array<FallingRect>();
@@ -135,19 +175,7 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
-		//timerFont.setColor(Color.WHITE);
-		if(game.gScr instanceof ZenGame) {
-			if(game.timerTime<=5) timerFont.setColor(Color.RED);
-			else timerFont.setColor(Color.WHITE);
-			timerFont.draw(game.batch, game.secondsToTime(game.timerTime, false), game.GAME_WIDTH-130, game.GAME_HEIGHT-10);
-		}
-		game.batch.draw(cloudsBase, 0, game.GAME_HEIGHT-(cloudsBase.getHeight()));
-		scoreFont.setColor(Color.YELLOW);
-		if(!game.showZenScores) scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
-		else scoreFont.draw(game.batch, "Score: "+game.zenScore, 10, game.GAME_HEIGHT-10);
-		if (game.showMissedDrops) scoreFont.draw(game.batch, "Missed: "+game.missedDrops, 10, game.GAME_HEIGHT-40);
-		if(!game.showZenScores) scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
-		else scoreFont.draw(game.batch, "Highscore: "+tempZenHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
+		game.batch.draw(cloudsBase, 0, game.GAME_HEIGHT-(cloudsBase.getHeight()));		
 		game.batch.end();
 		
 		if(!game.paused) {
@@ -218,6 +246,23 @@ public class GameScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
 		game.batch.draw(cloudsTop, 0, game.GAME_HEIGHT-(cloudsTop.getHeight()-10));
+		
+		if(game.gScr instanceof ZenGame) {
+			if(game.timerTime<=5) timerFont.setColor(Color.RED);
+			else timerFont.setColor(Color.BLUE);
+			timerFont.draw(game.batch, game.secondsToTime(game.timerTime, false), game.GAME_WIDTH-130, game.GAME_HEIGHT-10);
+		}
+		
+		scoreFont.setColor(Color.DARK_GRAY);
+		if(!game.showZenScores) scoreFont.draw(game.batch, "Score: "+game.score, 10, game.GAME_HEIGHT-10);
+		else scoreFont.draw(game.batch, "Score: "+game.zenScore, 10, game.GAME_HEIGHT-10);
+		if (game.showMissedDrops) scoreFont.draw(game.batch, "Missed: "+game.missedDrops, 10, game.GAME_HEIGHT-40);
+		if(!game.showZenScores) scoreFont.draw(game.batch, "Highscore: "+tempHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
+		else {
+			scoreFont.setColor(Color.GRAY);
+			scoreFont.draw(game.batch, "Highscore: "+tempZenHighscore, 10, game.GAME_HEIGHT-(game.showMissedDrops ? 80 : 40));
+		}
+		
 		game.batch.end();
 		
 		update(delta);
@@ -293,10 +338,14 @@ public class GameScreen implements Screen {
 					if(poisoned) {
 						if(game.gScr instanceof ZenGame) game.zenScore--;
 						else game.score--;
+					} else if(doKonamiCheat){
+						if(game.gScr instanceof ZenGame) game.zenScore+=10;
+						else game.score+=10;
 					} else {
 						if(game.gScr instanceof ZenGame) game.zenScore++;
 						else game.score++;
 					}
+					
 					if(game.gScr instanceof ZenGame) updateZenTotal();
 					if(game.score > tempHighscore) tempHighscore = game.score;
 					if(game.zenTotal > tempZenHighscore) tempZenHighscore = game.zenTotal;
@@ -383,6 +432,14 @@ public class GameScreen implements Screen {
 					}
 				}
 			}
+			
+			if(konami.sequenceFound()) {
+				System.out.println("Konami!!");
+				doKonamiCheat = true;
+				konami.reset();
+			}
+			konami.update();
+			// */
 		}
 		
 		camera.update();

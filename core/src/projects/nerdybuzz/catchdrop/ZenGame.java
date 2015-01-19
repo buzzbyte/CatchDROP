@@ -20,12 +20,13 @@ public class ZenGame extends GameScreen {
 	public static boolean activePoisonDrop = false;
 	public boolean poisonSpawnTimed;
 
-	public ZenGame(CDGame game) {
-		super(game);
+	public ZenGame(CDGame game, int bucketX, boolean bucketTouched) {
+		super(game, bucketX, bucketTouched);
 		game.showMissedDrops = true;
 		game.showZenScores = true;
 		loseOnMissedDrop = false;
 		spawnBurntToast = false;
+		poisoned = false;
 		game.timerTime = 60;
 		nowTimeInSeconds = TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000;
 		lastTimeInSeconds = nowTimeInSeconds;

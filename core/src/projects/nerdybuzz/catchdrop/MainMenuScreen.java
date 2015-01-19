@@ -20,6 +20,8 @@ public class MainMenuScreen implements Screen {
 	CharSequence ghscoreText;
 	CharSequence ghzenscoreText;
 	CharSequence promptText1;
+	CharSequence classicText = "Classic";
+	CharSequence zenText = "Zen";
 	private BitmapFont welcomeFont;
 	private BitmapFont scoreFont;
 	private BitmapFont promptFont;
@@ -37,7 +39,7 @@ public class MainMenuScreen implements Screen {
 	public MainMenuScreen(final CDGame game) {
 		this.game = game;
 		camera = game.camera;
-		promptText1 = game.callToAction + " the bucket to play";
+		promptText1 = game.callToAction + " a bucket to play";
 		
 		bucketX = game.GAME_WIDTH/2-64/2;
 		bucketY = 20;
@@ -57,6 +59,9 @@ public class MainMenuScreen implements Screen {
 		ghscoreText = "Classic Highscore: " + game.getHighscore();
 		ghzenscoreText = "Zen Highscore: " + game.getZenHighscore();
 		
+		game.classicText = classicText;
+		game.zenText = zenText;
+		
 		welcomeFont = game.assManager.get("title.ttf", BitmapFont.class);
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
 		promptFont = game.assManager.get("prompt.ttf", BitmapFont.class);
@@ -65,7 +70,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		game.shapeRender.setProjectionMatrix(camera.combined);
@@ -76,7 +81,12 @@ public class MainMenuScreen implements Screen {
 		
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
-		game.batch.draw(new Texture("bucket.png"), bucketX, bucketY);
+		game.batch.draw(new Texture("bucket-classic.png"), bucketX/2, bucketY); // Classic
+		game.batch.draw(new Texture("bucket-zen.png"), bucketX*1.5f, bucketY); // Zen
+		//scoreFont.setColor(Color.BLUE);
+		//scoreFont.draw(game.batch, game.classicText, (bucketX/2)-(scoreFont.getBounds(game.classicText).width/2), bucketY+40);
+		//scoreFont.setColor(Color.GREEN);
+		//scoreFont.draw(game.batch, game.zenText, (bucketX*1.5f)+(scoreFont.getBounds(game.zenText).width/2), bucketY+40);
 		cornerFont.setColor(Color.WHITE);
 		cornerFont.draw(game.batch, CDGame.GAME_VERSION, 5, game.GAME_HEIGHT-5);
 		//if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
@@ -100,6 +110,7 @@ public class MainMenuScreen implements Screen {
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
 			
+			/*
 			if(touchPos.x >= bucketX && touchPos.x <= bucketX+64) {
 				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
 					game.score = 0;
@@ -110,6 +121,31 @@ public class MainMenuScreen implements Screen {
 						game.setScreen(new ZenGame(game));
 					}
 					
+					dispose();
+				}
+			}
+			// */
+			
+			if(touchPos.x >= bucketX/2 && touchPos.x <= bucketX/2+124) {
+				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
+					game.score = 0;
+					game.zenScore = 0;
+					game.zenTotal = 0;
+					game.missedDrops = 0;
+					game.gScr = new ClassicGame(game, (int)bucketX, false);
+					game.setScreen(new ClassicGame(game, (int)bucketX, true));
+					dispose();
+				}
+			}
+			
+			if(touchPos.x >= bucketX*1.5f && touchPos.x <= bucketX*1.5f+64) {
+				if(touchPos.y >= bucketY && touchPos.y <= bucketY+64) {
+					game.score = 0;
+					game.zenScore = 0;
+					game.zenTotal = 0;
+					game.missedDrops = 0;
+					game.gScr = new ZenGame(game, (int)bucketX, false);
+					game.setScreen(new ZenGame(game, (int)bucketX, true));
 					dispose();
 				}
 			}

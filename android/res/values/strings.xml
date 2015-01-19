@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">CatchDrop</string>
-
+    <string name="app_id">1069735257717</string>
+    <string name="chs_leaderboard_id">CgkI9czCiZEfEAIQCQ</string>
+    <string name="zhs_leaderboard_id">CgkI9czCiZEfEAIQDQ</string>
 </resources>

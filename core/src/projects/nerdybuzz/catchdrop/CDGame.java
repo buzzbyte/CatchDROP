@@ -1,5 +1,7 @@
 package projects.nerdybuzz.catchdrop;
 
+import projects.nerdybuzz.catchdrop.googleservices.IGoogleServices;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -17,8 +19,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoa
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class CDGame extends Game {
-	//public static final String GAME_VERSION = "v0.3.0 (alpha)";
-	public static final String GAME_VERSION = "testing-alpha";
+	public static final String GAME_VERSION = "v0.4.2.2 (alpha)";
+	//public static final String GAME_VERSION = "testing-alpha";
 	
 	public final int GAME_WIDTH  = 800;
 	public final int GAME_HEIGHT = 480;
@@ -55,20 +57,28 @@ public class CDGame extends Game {
 	public boolean spawnDrops = true;
 
 	public boolean initedSettings = false;
+
+	public CharSequence classicText = "Classic";
+	public CharSequence zenText = "Zen";
 	
-	public CDGame() {
+	public static IGoogleServices googleServices;
+	
+	public CDGame(IGoogleServices googleServices) {
+		this.googleServices = googleServices;
 		this.callToAction = "Touch or Click";
 		this.usingDesktop = true;
 		this.noDrag  = true;
 	}
 	
-	public CDGame(String callToAction) {
+	public CDGame(IGoogleServices googleServices, String callToAction) {
+		this.googleServices = googleServices;
 		this.callToAction = callToAction;
 		this.usingDesktop = true;
 		this.noDrag  = true;
 	}
 	
-	public CDGame(String callToAction, boolean desktop) {
+	public CDGame(IGoogleServices googleServices, String callToAction, boolean desktop) {
+		this.googleServices = googleServices;
 		this.callToAction = callToAction;
 		this.usingDesktop = desktop;
 		this.noDrag  = desktop;
@@ -82,33 +92,33 @@ public class CDGame extends Game {
 		assManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
 		
 		FreeTypeFontLoaderParameter titleParams = new FreeTypeFontLoaderParameter();
-		titleParams.fontFileName = "font/arial.ttf";
-		titleParams.fontParameters.size = 95;
+		titleParams.fontFileName = "font/atari.ttf";
+		titleParams.fontParameters.size = 75;
 		assManager.load("title.ttf", BitmapFont.class, titleParams);
 		
 		FreeTypeFontLoaderParameter promptParams = new FreeTypeFontLoaderParameter();
-		promptParams.fontFileName = "font/arial.ttf";
-		promptParams.fontParameters.size = 35;
+		promptParams.fontFileName = "font/prstartk.ttf";
+		promptParams.fontParameters.size = 25;
 		assManager.load("prompt.ttf", BitmapFont.class, promptParams);
 		
 		FreeTypeFontLoaderParameter scoreParams1 = new FreeTypeFontLoaderParameter();
-		scoreParams1.fontFileName = "font/arial.ttf";
-		scoreParams1.fontParameters.size = 27;
+		scoreParams1.fontFileName = "font/atari.ttf";
+		scoreParams1.fontParameters.size = 20;
 		assManager.load("score.ttf", BitmapFont.class, scoreParams1);
 		
 		FreeTypeFontLoaderParameter timerParams = new FreeTypeFontLoaderParameter();
-		timerParams.fontFileName = "font/arial.ttf";
-		timerParams.fontParameters.size = 45;
+		timerParams.fontFileName = "font/atari.ttf";
+		timerParams.fontParameters.size = 25;
 		assManager.load("timer.ttf", BitmapFont.class, timerParams);
 		
 		FreeTypeFontLoaderParameter goverParams = new FreeTypeFontLoaderParameter();
-		goverParams.fontFileName = "font/arial.ttf";
-		goverParams.fontParameters.size = 85;
+		goverParams.fontFileName = "font/atari.ttf";
+		goverParams.fontParameters.size = 75;
 		assManager.load("gover.ttf", BitmapFont.class, goverParams);
 		
 		FreeTypeFontLoaderParameter versionParams = new FreeTypeFontLoaderParameter();
-		versionParams.fontFileName = "font/arial.ttf";
-		versionParams.fontParameters.size = 20;
+		versionParams.fontFileName = "font/prstartk.ttf";
+		versionParams.fontParameters.size = 15;
 		assManager.load("corner.ttf", BitmapFont.class, versionParams);
 		assManager.load("size20.ttf", BitmapFont.class, versionParams);
 		
@@ -129,7 +139,8 @@ public class CDGame extends Game {
 		camera.setToOrtho(false, GAME_WIDTH, GAME_HEIGHT);
 		
 		mMScr = new MainMenuScreen(this);
-		gScr = new ClassicGame(this);
+		//gScr = new GameScreen(this);
+		//gScr = new ZenGame(this);
 		//gSettings = new SettingsScreen(this);
 		
 		this.setScreen(mMScr);
@@ -180,6 +191,7 @@ public class CDGame extends Game {
 		gamePrefs.putLong("highscore", highscore);
 		highScore = highscore;
 		gamePrefs.flush();
+		googleServices.submitClassicScore(highscore);
 	}
 	
 	public long getZenHighscore() {
@@ -190,6 +202,7 @@ public class CDGame extends Game {
 		gamePrefs.putLong("zen-highscore", highscore);
 		zenHighScore = highscore;
 		gamePrefs.flush();
+		googleServices.submitZenScore(highscore);
 	}
 	
 	@Override

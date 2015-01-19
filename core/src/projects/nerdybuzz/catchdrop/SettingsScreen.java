@@ -41,6 +41,7 @@ public class SettingsScreen implements Screen {
 	private TextButton gameModeSetting;
 	
 	private int gmIndex = 0;
+	private int count;
 	
 	public SettingsScreen(final CDGame game) {
 		this.game = game;
@@ -92,12 +93,15 @@ public class SettingsScreen implements Screen {
 		dragSetting = new TextButton("Dragging: "+game.dragStr,skin);
 		if(game.autoPause) autoPauseSetting.setChecked(true); else autoPauseSetting.setChecked(false);
 		if(game.noDrag) dragSetting.setChecked(false); else dragSetting.setChecked(true);
+		TextButton showCHSBtn = new TextButton("Classic Highscores", skin);
+		TextButton showZHSBtn = new TextButton("Zen Highscores", skin);
 		TextButton backBtn = new TextButton("Back", skin);
 		
 		gameModeSetting.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if(shown) {
+					/*
 					System.out.println("Setting Clicked!");
 					GameScreen[] gameModes = {
 							new ZenGame(game),
@@ -113,6 +117,7 @@ public class SettingsScreen implements Screen {
 					System.out.println("Game mode index: "+gmIndex);
 					System.out.println("Game mode: "+game.gameModeStr);
 					System.out.println("Game mode: "+game.gScr);
+					// */
 				}
 			}
 		});
@@ -152,10 +157,24 @@ public class SettingsScreen implements Screen {
 			}
 		});
 		
+		showCHSBtn.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(shown) CDGame.googleServices.showClassicScores();
+			}
+		});
+		
+		showZHSBtn.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(shown) CDGame.googleServices.showZenScores();
+			}
+		});
+		
 		table = new Table();
 		table.add(scrTitle).pad(10);
 		table.row();
-		table.add(gameModeSetting).width(300).height(50).pad(5);
+		//table.add(gameModeSetting).width(300).height(50).pad(5);
 		table.row();
 		if(game.usingDesktop) {
 			table.add(autoPauseSetting).width(300).height(50).pad(5);
@@ -163,6 +182,10 @@ public class SettingsScreen implements Screen {
 			table.add(dragSetting).width(300).height(50).pad(5);
 			table.row();
 		}
+		table.add(showCHSBtn).width(300).height(50).pad(5);
+		table.row();
+		table.add(showZHSBtn).width(300).height(50).pad(5);
+		table.row();
 		table.add(backBtn).width(300).height(50).pad(5);
 		table.setPosition(game.GAME_WIDTH/2, game.GAME_HEIGHT/2);
 		stage.addActor(table);
@@ -191,6 +214,7 @@ public class SettingsScreen implements Screen {
 		if(game.autoPause) autoPauseSetting.setChecked(true); else autoPauseSetting.setChecked(false);
 		if(game.noDrag) dragSetting.setChecked(false); else dragSetting.setChecked(true);
 		
+		
 		if(Gdx.input.isKeyJustPressed(Keys.P)) {
 			toggleAutoPause();
 		}
@@ -198,6 +222,14 @@ public class SettingsScreen implements Screen {
 		if(Gdx.input.isKeyJustPressed(Keys.D)) {
 			toggleDragging();
 		}
+		// */
+		
+		/*
+		if(shown) {
+			System.out.println("Update! #"+count);
+			count++;
+		}
+		// */
 		
 		camera.update();
 	}
