@@ -34,7 +34,9 @@ public class MainMenuScreen implements Screen {
 	private int settingsBtnY;
 	private Vector3 touchPos;
 	
+	private Texture backgroundImg;
 	private Texture settingsIcon;
+	
 	private GlyphLayout glayout;
 	
 	
@@ -49,6 +51,11 @@ public class MainMenuScreen implements Screen {
 		settingsBtnX = 10;
 		settingsBtnY = 10;
 		
+		if(game.usingDesktop || game.GAME_HEIGHT < 768) {
+			backgroundImg = new Texture(Gdx.files.internal("bg_main_mini.png"));
+		} else {
+			backgroundImg = new Texture(Gdx.files.internal("bg_main_ipad.png"));
+		}
 		settingsIcon = new Texture("gear_btn.png");
 		
 		touchPos = new Vector3();
@@ -85,25 +92,26 @@ public class MainMenuScreen implements Screen {
 		
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
+		game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
 		game.batch.draw(new Texture("bucket-classic.png"), bucketX/2, bucketY); // Classic
 		game.batch.draw(new Texture("bucket-zen.png"), bucketX*1.5f, bucketY); // Zen
 		//scoreFont.setColor(Color.BLUE);
 		//scoreFont.draw(game.batch, game.classicText, (bucketX/2)-(scoreFont.getBounds(game.classicText).width/2), bucketY+40);
 		//scoreFont.setColor(Color.GREEN);
 		//scoreFont.draw(game.batch, game.zenText, (bucketX*1.5f)+(scoreFont.getBounds(game.zenText).width/2), bucketY+40);
-		cornerFont.setColor(Color.WHITE);
+		cornerFont.setColor(Color.BLACK);
 		cornerFont.draw(game.batch, CDGame.GAME_VERSION, 5, game.GAME_HEIGHT-5);
 		//if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
-		welcomeFont.setColor(Color.GREEN);
+		welcomeFont.setColor(Color.BLUE);
 		glayout.setText(welcomeFont, welcomeText);
-		welcomeFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height+200);
-		scoreFont.setColor(Color.YELLOW);
+		//welcomeFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height+200);
+		scoreFont.setColor(Color.GRAY);
 		//if(game.usingDesktop) scoreFont.draw(game.batch, optionText1.toString(), game.GAME_WIDTH/2-scoreFont.getBounds(optionText1).width/2, game.GAME_HEIGHT/2-scoreFont.getBounds(optionText1).height+55);
 		glayout.setText(scoreFont, ghscoreText);
 		scoreFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height+25);
 		glayout.setText(scoreFont, ghzenscoreText);
 		scoreFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height-15);
-		promptFont.setColor(Color.WHITE);
+		promptFont.setColor(Color.DARK_GRAY);
 		glayout.setText(promptFont, promptText1);
 		promptFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height*4);
 		game.batch.draw(settingsIcon, settingsBtnX, settingsBtnY, 64, 64);

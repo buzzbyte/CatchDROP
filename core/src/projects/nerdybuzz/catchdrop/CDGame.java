@@ -115,7 +115,7 @@ public class CDGame extends Game {
 	}
 	
 	public void create() {
-		assManager = new AssetManager();
+		assManager = new AssetManager(); // I manage dat ass...
 		
 		FileHandleResolver resolver = new InternalFileHandleResolver();
 		assManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
@@ -127,9 +127,14 @@ public class CDGame extends Game {
 		assManager.load("title.ttf", BitmapFont.class, titleParams);
 		
 		FreeTypeFontLoaderParameter promptParams = new FreeTypeFontLoaderParameter();
-		promptParams.fontFileName = "font/prstartk.ttf";
-		promptParams.fontParameters.size = 25;
+		promptParams.fontFileName = "font/MyriadPro-Regular.otf";
+		promptParams.fontParameters.size = 35;
 		assManager.load("prompt.ttf", BitmapFont.class, promptParams);
+		
+		FreeTypeFontLoaderParameter promptBoldParams = new FreeTypeFontLoaderParameter();
+		promptBoldParams.fontFileName = "font/MyriadPro-Bold.otf";
+		promptBoldParams.fontParameters.size = 35;
+		assManager.load("prompt_bold.ttf", BitmapFont.class, promptBoldParams);
 		
 		FreeTypeFontLoaderParameter scoreParams1 = new FreeTypeFontLoaderParameter();
 		scoreParams1.fontFileName = "font/atari.ttf";
@@ -142,8 +147,8 @@ public class CDGame extends Game {
 		assManager.load("timer.ttf", BitmapFont.class, timerParams);
 		
 		FreeTypeFontLoaderParameter goverParams = new FreeTypeFontLoaderParameter();
-		goverParams.fontFileName = "font/atari.ttf";
-		goverParams.fontParameters.size = 75;
+		goverParams.fontFileName = "font/MyriadPro-Bold.otf";
+		goverParams.fontParameters.size = 95;
 		assManager.load("gover.ttf", BitmapFont.class, goverParams);
 		
 		FreeTypeFontLoaderParameter versionParams = new FreeTypeFontLoaderParameter();

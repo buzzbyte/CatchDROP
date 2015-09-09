@@ -69,7 +69,9 @@ public class GameScreen implements Screen {
 
 	private int burntToastScore;
 	private boolean burntToastExists;
-
+	
+	private Texture backgroundImg;
+	
 	private Texture cloudsTop;
 
 	private Texture cloudsBase;
@@ -141,6 +143,11 @@ public class GameScreen implements Screen {
 		
 		bucketImg = new Texture(Gdx.files.internal("bucket.png"));
 		dropImg = new Texture(Gdx.files.internal("drop.png"));
+		if(game.usingDesktop || game.GAME_HEIGHT < 768) {
+			backgroundImg = new Texture(Gdx.files.internal("bg_mini.png"));
+		} else {
+			backgroundImg = new Texture(Gdx.files.internal("bg_ipad.png"));
+		}
 		cloudsTop = new Texture("clouds-top.png");
 		cloudsBase = new Texture("clouds-base.png");
 		//burntToastImg = new Texture(Gdx.files.internal("burntToast.jpg"));
@@ -180,15 +187,19 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
+		game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
 		game.batch.draw(cloudsBase, 0, game.GAME_HEIGHT-(cloudsBase.getHeight()));		
 		game.batch.end();
 		
+		/*
+		game.shapeRender.setProjectionMatrix(camera.combined);
+		game.shapeRender.begin(ShapeType.Filled);
+		game.shapeRender.setColor(Color.DARK_GRAY);
+		game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
+		game.shapeRender.end();
+		// */
+		
 		if(!game.paused) {
-			game.shapeRender.setProjectionMatrix(camera.combined);
-			game.shapeRender.begin(ShapeType.Filled);
-			game.shapeRender.setColor(Color.DARK_GRAY);
-			game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
-			game.shapeRender.end();
 			
 			game.batch.setProjectionMatrix(camera.combined);
 			game.batch.begin();
@@ -235,19 +246,13 @@ public class GameScreen implements Screen {
 			}
 			game.batch.end();
 		} else {
-			game.shapeRender.setProjectionMatrix(camera.combined);
-			game.shapeRender.begin(ShapeType.Filled);
-			game.shapeRender.setColor(Color.DARK_GRAY);
-			game.shapeRender.rect(ground.x, ground.y, ground.width, ground.height);
-			game.shapeRender.end();
-			
 			game.batch.setProjectionMatrix(camera.combined);
 			game.batch.begin();
 			game.batch.draw(bucketImg, bucket.x, bucket.y);
-			mainFont.setColor(Color.WHITE);
+			mainFont.setColor(Color.BLACK);
 			glayout.setText(mainFont, pauseText);
 			mainFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height+20);
-			mainFont.setColor(Color.LIGHT_GRAY);
+			mainFont.setColor(Color.DARK_GRAY);
 			glayout.setText(mainFont, pausePromptText);
 			mainFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height-20);
 			if(!game.autoPause) {

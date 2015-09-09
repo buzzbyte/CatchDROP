@@ -28,6 +28,7 @@ public class EndScreen implements Screen {
 	private BitmapFont mainFont;
 	private BitmapFont scoreFont;
 	private BitmapFont promptFont;
+	private BitmapFont promptBoldFont;
 	@SuppressWarnings("unused")
 	private BitmapFont cornerFont;
 	
@@ -37,9 +38,12 @@ public class EndScreen implements Screen {
 	private int settingsBtnY;
 	private Vector3 touchPos;
 	
+	private Texture backgroundImg;
 	private Texture settingsIcon;
+	
 	private boolean showMissedDrops;
 	private boolean showZenScores;
+	
 	private GlyphLayout glayout;
 	
 
@@ -55,6 +59,11 @@ public class EndScreen implements Screen {
 		settingsBtnX = 10;
 		settingsBtnY = 10;
 		
+		if(game.usingDesktop || game.GAME_HEIGHT < 768) {
+			backgroundImg = new Texture(Gdx.files.internal("bg_mini.png"));
+		} else {
+			backgroundImg = new Texture(Gdx.files.internal("bg_ipad.png"));
+		}
 		settingsIcon = new Texture("gear_btn.png");
 		
 		touchPos = new Vector3();
@@ -100,6 +109,7 @@ public class EndScreen implements Screen {
 		mainFont = game.assManager.get("gover.ttf", BitmapFont.class);
 		scoreFont = game.assManager.get("score.ttf", BitmapFont.class);
 		promptFont = game.assManager.get("prompt.ttf", BitmapFont.class);
+		promptBoldFont = game.assManager.get("prompt_bold.ttf", BitmapFont.class);
 		cornerFont = game.assManager.get("corner.ttf", BitmapFont.class);
 		
 		glayout = new GlyphLayout();
@@ -118,19 +128,20 @@ public class EndScreen implements Screen {
 		
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
+		game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
 		game.batch.draw(new Texture("bucket-classic.png"), bucketX/2, bucketY); // Classic
 		game.batch.draw(new Texture("bucket-zen.png"), bucketX*1.5f, bucketY); // Zen
 		//scoreFont.setColor(Color.BLUE);
 		//scoreFont.draw(game.batch, game.classicText, (bucketX/2)-(scoreFont.getBounds(game.classicText).width/2), bucketY+40);
 		//scoreFont.setColor(Color.GREEN);
 		//scoreFont.draw(game.batch, game.zenText, (bucketX*1.5f)+(scoreFont.getBounds(game.zenText).width/2), bucketY+40);
-		promptFont.setColor(Color.GREEN);
-		glayout.setText(promptFont, gnewhighscoreText);
-		promptFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT-30);
+		promptBoldFont.setColor(Color.OLIVE);
+		glayout.setText(promptBoldFont, gnewhighscoreText);
+		promptBoldFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT-30);
 		mainFont.setColor(Color.RED);
 		glayout.setText(mainFont, goverText);
 		mainFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height+200+10);
-		scoreFont.setColor(Color.YELLOW);
+		scoreFont.setColor(Color.GRAY);
 		if(!showZenScores) {
 			glayout.setText(scoreFont, gscoreText);
 			scoreFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height+55+10);
@@ -151,7 +162,7 @@ public class EndScreen implements Screen {
 			glayout.setText(scoreFont, ghzenscoreText);
 			scoreFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height-50+10);
 		}
-		promptFont.setColor(Color.WHITE);
+		promptFont.setColor(Color.DARK_GRAY);
 		glayout.setText(promptFont, promptText1);
 		promptFont.draw(game.batch, glayout, game.GAME_WIDTH/2-glayout.width/2, game.GAME_HEIGHT/2-glayout.height*(showMissedDrops ? 4 : 2));
 		//if(game.usingDesktop) cornerFont.draw(game.batch, optionText1, 10, cornerFont.getBounds(optionText1).height+10);
