@@ -40,8 +40,8 @@ public class SettingsScreen implements Screen {
 	private boolean shown = false;
 	private TextButton gameModeSetting;
 	
-	private int gmIndex = 0;
-	private int count;
+	//private int gmIndex = 0;
+	//private int count;
 	
 	public SettingsScreen(final CDGame game) {
 		this.game = game;
@@ -190,10 +190,12 @@ public class SettingsScreen implements Screen {
 			table.add(dragSetting).width(300).height(50).pad(5);
 			table.row();
 		}
-		table.add(showCHSBtn).width(300).height(50).pad(5);
-		table.row();
-		table.add(showZHSBtn).width(300).height(50).pad(5);
-		table.row();
+		if(!game.usingDesktop) { // Let's hide these from desktop for now until we have a working leaderboard system for desktop version.
+			table.add(showCHSBtn).width(300).height(50).pad(5);
+			table.row();
+			table.add(showZHSBtn).width(300).height(50).pad(5);
+			table.row();
+		}
 		table.add(backBtn).width(300).height(50).pad(5);
 		table.setPosition(game.GAME_WIDTH/2, game.GAME_HEIGHT/2);
 		stage.addActor(table);

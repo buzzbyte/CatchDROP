@@ -67,28 +67,28 @@ public class CDGame extends Game {
 	public static IGoogleServices googleServices;
 	
 	public CDGame(IGoogleServices googleServices) {
-		this.googleServices = googleServices;
+		CDGame.googleServices = googleServices;
 		this.callToAction = "Touch or Click";
 		this.usingDesktop = true;
 		this.noDrag  = true;
 	}
 	
 	public CDGame(IGoogleServices googleServices, String callToAction) {
-		this.googleServices = googleServices;
+		CDGame.googleServices = googleServices;
 		this.callToAction = callToAction;
 		this.usingDesktop = true;
 		this.noDrag  = true;
 	}
 	
 	public CDGame(IGoogleServices googleServices, String callToAction, boolean desktop) {
-		this.googleServices = googleServices;
+		CDGame.googleServices = googleServices;
 		this.callToAction = callToAction;
 		this.usingDesktop = desktop;
 		this.noDrag  = desktop;
 	}
 	
 	public CDGame(IGoogleServices googleServices, int gwidth, int gheight) {
-		this.googleServices = googleServices;
+		CDGame.googleServices = googleServices;
 		this.callToAction = "Touch or Click";
 		this.usingDesktop = true;
 		this.noDrag  = true;
@@ -97,7 +97,7 @@ public class CDGame extends Game {
 	}
 	
 	public CDGame(IGoogleServices googleServices, String callToAction, int gwidth, int gheight) {
-		this.googleServices = googleServices;
+		CDGame.googleServices = googleServices;
 		this.callToAction = callToAction;
 		this.usingDesktop = true;
 		this.noDrag  = true;
@@ -106,7 +106,7 @@ public class CDGame extends Game {
 	}
 	
 	public CDGame(IGoogleServices googleServices, String callToAction, boolean desktop, int gwidth, int gheight) {
-		this.googleServices = googleServices;
+		CDGame.googleServices = googleServices;
 		this.callToAction = callToAction;
 		this.usingDesktop = desktop;
 		this.noDrag  = desktop;
@@ -155,7 +155,11 @@ public class CDGame extends Game {
 		versionParams.fontFileName = "font/prstartk.ttf";
 		versionParams.fontParameters.size = 15;
 		assManager.load("corner.ttf", BitmapFont.class, versionParams);
-		assManager.load("size20.ttf", BitmapFont.class, versionParams);
+		
+		FreeTypeFontLoaderParameter menuFontParams = new FreeTypeFontLoaderParameter();
+		menuFontParams.fontFileName = "font/MyriadPro-Bold.otf";
+		menuFontParams.fontParameters.size = 25;
+		assManager.load("size20.ttf", BitmapFont.class, menuFontParams);
 		
 		FreeTypeFontLoaderParameter headerParams = new FreeTypeFontLoaderParameter();
 		headerParams.fontFileName = "font/arial.ttf";
