@@ -1,12 +1,10 @@
 package projects.nerdybuzz.catchdrop;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 //import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class AchievementSystem {
-	private static int timeCounter = 3000;
+	//private static int timeCounter = 3000;
 	private static int effectTimer = 1000;
 	
 	public static String[][] achievements = {
@@ -27,18 +25,18 @@ public class AchievementSystem {
 			
 			{"Got my toast!", "Catch the burnt toast."}
 	};
-	private static boolean achivementUnlocked;
-	private static String achivementTitle = "";
-	private static String achivementDesc = "";
+	//private static boolean achivementUnlocked;
+	//private static String achivementTitle = "";
+	//private static String achivementDesc = "";
 	private static long nowTimeInMillis;
 	private static long lastTimeInMillis;
 	
 	
 	public static void giveAchievement(String id, int index) {
 		CDGame.googleServices.unlockAchievement(id);
-		achivementUnlocked = true;
-		achivementTitle = achievements[index][0];
-		achivementDesc = achievements[index][1];
+		//achivementUnlocked = true;
+		//achivementTitle = achievements[index][0];
+		//achivementDesc = achievements[index][1];
 	}
 	
 	// This is kinda messed up...

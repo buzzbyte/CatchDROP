@@ -2,7 +2,6 @@ package projects.nerdybuzz.catchdrop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -16,8 +15,8 @@ public class PoisonDrop extends FallingRect implements FallingAct {
 	private ParticleEffect fireEffect;
 	private ParticleEffectPool fireEffectPool;
 	private PooledEffect firePEffect;
-	private float bucketX;
-	private float bucketY;
+	//private float bucketX;
+	//private float bucketY;
 	private int poisonTimer;
 	private long nowTimeInSeconds;
 	private long lastTimeInSeconds;

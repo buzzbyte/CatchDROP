@@ -3,7 +3,6 @@ package projects.nerdybuzz.catchdrop;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
-import org.robovm.apple.uikit.UIGraphics;
 import org.robovm.apple.uikit.UIScreen;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
