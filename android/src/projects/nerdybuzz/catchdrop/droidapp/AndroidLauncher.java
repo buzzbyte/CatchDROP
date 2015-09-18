@@ -1,4 +1,4 @@
-package projects.nerdybuzz.catchdrop.android;
+package projects.nerdybuzz.catchdrop.droidapp;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -9,6 +9,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import projects.nerdybuzz.catchdrop.CDGame;
+import projects.nerdybuzz.catchdrop.droidapp.R;
 import projects.nerdybuzz.catchdrop.googleservices.IGoogleServices;
 
 import com.google.android.gms.games.Games;
@@ -75,7 +76,7 @@ public class AndroidLauncher extends AndroidApplication implements IGoogleServic
 
 	@Override
 	public void rateGame() {
-		String str ="https://play.google.com/store/apps/details?id=projects.nerdybuzz.catchdrop.android";
+		String str ="https://play.google.com/store/apps/details?id=projects.nerdybuzz.catchdrop.droidapp";
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(str)));
 	}
 
