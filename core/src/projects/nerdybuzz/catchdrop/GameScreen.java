@@ -184,7 +184,8 @@ public class GameScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
 		game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
-		game.batch.draw(cloudsBase, 0, game.GAME_HEIGHT-(cloudsBase.getHeight()));		
+		if(game.usingDesktop || game.GAME_HEIGHT < 768)
+			game.batch.draw(cloudsBase, 0, game.GAME_HEIGHT-(cloudsBase.getHeight()));
 		game.batch.end();
 		
 		/*
@@ -259,7 +260,8 @@ public class GameScreen implements Screen {
 		}
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
-		game.batch.draw(cloudsTop, 0, game.GAME_HEIGHT-(cloudsTop.getHeight()-10));
+		if(game.usingDesktop || game.GAME_HEIGHT < 768)
+			game.batch.draw(cloudsTop, 0, game.GAME_HEIGHT-(cloudsTop.getHeight()-10));
 		
 		if(game.gScr instanceof ZenGame) {
 			if(game.timerTime<=5) timerFont.setColor(Color.RED);
