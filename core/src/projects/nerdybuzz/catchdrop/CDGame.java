@@ -63,6 +63,8 @@ public class CDGame extends Game {
 
 	public CharSequence classicText = "Classic";
 	public CharSequence zenText = "Zen";
+
+	public String deviceModel = "default";
 	
 	public static IGoogleServices googleServices;
 	
@@ -112,6 +114,16 @@ public class CDGame extends Game {
 		this.noDrag  = desktop;
 		this.GAME_WIDTH  = gwidth;
 		this.GAME_HEIGHT = gheight;
+	}
+	
+	public CDGame(IGoogleServices googleServices, String callToAction, boolean desktop, int gwidth, int gheight, String deviceModel) {
+		CDGame.googleServices = googleServices;
+		this.callToAction = callToAction;
+		this.usingDesktop = desktop;
+		this.noDrag  = desktop;
+		this.GAME_WIDTH  = gwidth;
+		this.GAME_HEIGHT = gheight;
+		this.deviceModel  = deviceModel;
 	}
 	
 	public void create() {
@@ -176,6 +188,8 @@ public class CDGame extends Game {
 		
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, GAME_WIDTH, GAME_HEIGHT);
+		camera.viewportWidth = GAME_WIDTH;
+		camera.viewportHeight = GAME_HEIGHT;
 		
 		mMScr = new MainMenuScreen(this);
 		//gScr = new GameScreen(this);

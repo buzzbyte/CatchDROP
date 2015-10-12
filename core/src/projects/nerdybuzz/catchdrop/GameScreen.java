@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -89,6 +90,8 @@ public class GameScreen implements Screen {
 	private int bucketX;
 
 	private GlyphLayout glayout;
+
+	private Sprite bgSprite;
 	
 	public static Array<PooledEffect> effects = new Array<PooledEffect>();
 	
@@ -139,14 +142,13 @@ public class GameScreen implements Screen {
 		
 		bucketImg = new Texture(Gdx.files.internal("bucket.png"));
 		dropImg = new Texture(Gdx.files.internal("drop.png"));
-		if(game.usingDesktop || game.GAME_HEIGHT < 768) {
-			backgroundImg = new Texture(Gdx.files.internal("bg_mini.png"));
-		} else {
-			backgroundImg = new Texture(Gdx.files.internal("bg_ipad.png"));
-		}
+		backgroundImg = new Texture(Gdx.files.internal("bg_ipad.png"));
 		cloudsTop = new Texture("clouds-top.png");
 		cloudsBase = new Texture("clouds-base.png");
 		//burntToastImg = new Texture(Gdx.files.internal("burntToast.jpg"));
+		
+		backgroundImg.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+		bgSprite = new Sprite(backgroundImg);
 		
 		waterSplashPE = new ParticleEffect();
 		waterSplashPE.load(Gdx.files.internal("water-splash.p"), Gdx.files.internal(""));
@@ -183,7 +185,9 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
-		game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
+		bgSprite.setSize(game.GAME_WIDTH, game.GAME_HEIGHT);
+		bgSprite.draw(game.batch);
+		//game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
 		if(game.usingDesktop || game.GAME_HEIGHT < 768)
 			game.batch.draw(cloudsBase, 0, game.GAME_HEIGHT-(cloudsBase.getHeight()));
 		game.batch.end();

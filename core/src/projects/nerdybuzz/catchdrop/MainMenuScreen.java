@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 
@@ -38,6 +39,7 @@ public class MainMenuScreen implements Screen {
 	private Texture settingsIcon;
 	
 	private GlyphLayout glayout;
+	private Sprite bgSprite;
 	
 	
 	public MainMenuScreen(final CDGame game) {
@@ -51,12 +53,15 @@ public class MainMenuScreen implements Screen {
 		settingsBtnX = 10;
 		settingsBtnY = 10;
 		
-		if(game.usingDesktop || game.GAME_HEIGHT < 768) {
-			backgroundImg = new Texture(Gdx.files.internal("bg_main_mini.png"));
-		} else {
+		//if(game.usingDesktop || game.GAME_HEIGHT < 768) {
+		//	backgroundImg = new Texture(Gdx.files.internal("bg_main_mini.png"));
+		//} else {
 			backgroundImg = new Texture(Gdx.files.internal("bg_main_ipad.png"));
-		}
+		//}
 		settingsIcon = new Texture("gear_btn.png");
+		
+		backgroundImg.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+		bgSprite = new Sprite(backgroundImg);
 		
 		touchPos = new Vector3();
 		
@@ -92,7 +97,9 @@ public class MainMenuScreen implements Screen {
 		
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
-		game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
+		bgSprite.setSize(game.GAME_WIDTH, game.GAME_HEIGHT);
+		bgSprite.draw(game.batch);
+		//game.batch.draw(backgroundImg, 0, game.GAME_HEIGHT-(backgroundImg.getHeight()));
 		game.batch.draw(new Texture("bucket-classic.png"), bucketX/2, bucketY); // Classic
 		game.batch.draw(new Texture("bucket-zen.png"), bucketX*1.5f, bucketY); // Zen
 		//scoreFont.setColor(Color.BLUE);
